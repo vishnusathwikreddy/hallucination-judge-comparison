@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Qwen Results</title>
+<style>
+:root {
+  --bg: #fafaf9; --surface: #ffffff; --surface-2: #f4f4f2; --text: #1c1917; --muted: #57534e;
+  --border: #e7e5e4; --accent: #1d4ed8;
+  --j51: #1d4ed8; --j51-bg: rgba(29, 78, 216, .16);
+  --jmini: #b45309; --jmini-bg: rgba(217, 119, 6, .20);
+  --jnano: #be185d; --jnano-bg: rgba(219, 39, 119, .18);
+  --good: #15803d; --bad: #b91c1c;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121212; --surface: #1c1c1e; --surface-2: #26262a; --text: #f2f2f0; --muted: #a8a29e;
+    --border: #34343a; --accent: #7aa2ff;
+    --j51: #7aa2ff; --j51-bg: rgba(122, 162, 255, .24);
+    --jmini: #f5a524; --jmini-bg: rgba(245, 165, 36, .24);
+    --jnano: #f472b6; --jnano-bg: rgba(244, 114, 182, .24);
+    --good: #4ade80; --bad: #f87171;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121212; --surface: #1c1c1e; --surface-2: #26262a; --text: #f2f2f0; --muted: #a8a29e;
+  --border: #34343a; --accent: #7aa2ff;
+  --j51: #7aa2ff; --j51-bg: rgba(122, 162, 255, .24);
+  --jmini: #f5a524; --jmini-bg: rgba(245, 165, 36, .24);
+  --jnano: #f472b6; --jnano-bg: rgba(244, 114, 182, .24);
+  --good: #4ade80; --bad: #f87171;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+main { max-width: 1120px; margin: 0 auto; padding: 32px 16px 64px; }
+h1 { font-size: 1.75rem; line-height: 1.25; margin: 0 0 8px; letter-spacing: -.01em; }
+h2 { font-size: 1.2rem; margin: 40px 0 12px; }
+h3 { font-size: 1rem; margin: 0 0 6px; }
+p { margin: 0 0 12px; }
+.lede { color: var(--muted); font-size: 1.02rem; max-width: 820px; }
+.muted { color: var(--muted); }
+.small { font-size: .86rem; }
+a { color: var(--accent); }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em;
+  background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
+.conclusion { border-left: 4px solid var(--accent); }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.grid2 .wide { grid-column: 1 / -1; }
+@media (max-width: 760px) { .grid3, .grid2 { grid-template-columns: 1fr; } }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .92rem; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+td { white-space: nowrap; }
+th { vertical-align: bottom; }
+th { color: var(--muted); font-weight: 600; font-size: .82rem; text-transform: uppercase; letter-spacing: .03em; }
+td.num { font-variant-numeric: tabular-nums; }
+
+nav.top { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: .9rem; margin-bottom: 22px; }
+nav.top a { text-decoration: none; }
+nav.top a.here { color: var(--text); font-weight: 600; }
+th.num, td.num { text-align: right; }
+td .ci { display: block; color: var(--muted); font-size: .76rem; white-space: nowrap; }
+.d-good { color: var(--good); font-weight: 650; }
+.d-bad { color: var(--bad); font-weight: 650; }
+tr.group td { background: var(--surface-2); color: var(--muted); font-size: .76rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .04em; padding: 6px 10px; }
+tr.base td { font-weight: 600; }
+tr.ours td:first-child { color: var(--accent); }
+td.pending { color: var(--muted); font-style: italic; white-space: normal; }
+.defs { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; margin: 0; font-size: .9rem; }
+.defs dt { font-weight: 600; }
+.defs dd { margin: 0; color: var(--muted); }
+@media (max-width: 640px) { .defs { grid-template-columns: 1fr; } .defs dd { margin-bottom: 6px; } }
+.status { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 14px; }
+@media (max-width: 760px) { .status { grid-template-columns: 1fr; } }
+.status .panel h3 { font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.status .panel p { margin: 0; }
+footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1px solid var(--border); padding-top: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <nav class="top"><a class="here" href="qwen.html">Qwen results</a><a href="index.html">Judge comparison</a></nav>
+  <h1>Qwen2.5-VL: probe-reward GRPO results</h1>
+  <p class="lede">The base model, every RL run, and the other hallucination-reduction methods, in one place.
+  Updated 24 Oct 2026.</p>
+
+  <div class="status">
+    <div class="panel"><h3>Old run (L40S)</h3><p>Fewer hallucinations than the base model
+    <strong>even at matched length</strong> (−0.38 judged findings per caption), on the old 600-image test set.</p></div>
+    <div class="panel"><h3>New data, two seeds</h3><p>Fewer findings only because captions got shorter:
+    <strong>no change at matched length</strong> in any of four checkpoints.</p></div>
+    <div class="panel"><h3>Running now</h3><p>Two runs that test why: the old probe on the new data (A), and the new
+    probe with a reshaped reward (B). <a href="#running">Details</a>.</p></div>
+  </div>
+
+  <h2>How to read the tables</h2>
+  <div class="panel">
+    <dl class="defs">
+      <dt>Base / RL</dt><dd>Qwen2.5-VL-3B-Instruct without training / after 300 GRPO steps with LoRA, where the only
+      reward is a probe on the model’s own hidden states. Step 300 was fixed as the main checkpoint before training.
+      Greedy captions.</dd>
+      <dt>Matched length</dt><dd>Each base caption is cut to its paired RL caption’s token count. Shorter captions
+      contain fewer errors, so this is the fair comparison: a model cannot win just by saying less.</dd>
+      <dt>Judged findings</dt><dd>Errors per caption found by the gpt-5.1 judge: wrong objects, attributes, relations and
+      counts. Lower is better.</dd>
+      <dt>Judge-free</dt><dd>From the COCO object annotations, no judge. CHAIR<sub>S</sub>: share of captions naming at
+      least one object not in the image. CHAIR<sub>I</sub>: share of object mentions that are wrong
+      (precision = 1 − CHAIR<sub>I</sub>). Recall: share of the image’s annotated objects the caption names.</dd>
+      <dt>Δ and CI</dt><dd>RL minus base, paired over images; 95% bootstrap interval underneath.
+      <span class="d-good">Green</span>: the interval excludes zero and RL is better.
+      <span class="d-bad">Red</span>: it excludes zero and RL is worse.</dd>
+    </dl>
+  </div>
+
+  <h2>1. Qwen2.5-VL-3B on the new data</h2>
+  <p class="muted small">1,000 held-out COCO test images (the <code>coco_v2</code> split); full-length captions.</p>
+  <div class="panel table-wrap">
+    <table>
+      <thead><tr><th>Model</th><th class="num">Tokens</th><th class="num">Judged findings / caption ↓</th>
+        <th class="num">CHAIR<sub>S</sub> ↓</th><th class="num">CHAIR<sub>I</sub> ↓</th><th class="num">Recall ↑</th>
+        <th class="num">Objects named</th></tr></thead>
+      <tbody>
+<tr class="base"><td><strong>Base</strong> (no training)</td><td class="num">203.5</td><td class="num">2.27</td><td class="num">41.4%</td><td class="num">20.0%</td><td class="num">72.7%</td><td class="num">2.97</td></tr>
+<tr class=""><td>RL, seed 42, step 300</td><td class="num">166.3</td><td class="num">1.86</td><td class="num">41.1%</td><td class="num">19.3%</td><td class="num">71.7%</td><td class="num">2.90</td></tr>
+<tr class=""><td>RL, seed 43, step 300</td><td class="num">177.3</td><td class="num">1.99</td><td class="num">39.2%</td><td class="num">19.4%</td><td class="num">71.8%</td><td class="num">2.90</td></tr>
+<tr class=""><td>RL, seed 42, step 250</td><td class="num">163.2</td><td class="num">1.86</td><td class="num">39.7%</td><td class="num">18.7%</td><td class="num">71.7%</td><td class="num">2.88</td></tr>
+<tr class=""><td>RL, seed 43, step 250</td><td class="num">177.5</td><td class="num">1.97</td><td class="num">41.2%</td><td class="num">19.9%</td><td class="num">71.4%</td><td class="num">2.91</td></tr>
+<tr><td>RL, run A: old probe (seed 42)</td><td class="pending" colspan="6">training now; results after judging</td></tr>
+<tr><td>RL, run B: new probe + risk rate (seed 42)</td><td class="pending" colspan="6">training now; results after judging</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>2. RL minus base: is the gain more than shorter captions?</h2>
+  <p class="muted small">Base: 2.27 findings per caption and 203.5 tokens on the new test set;
+  2.10 and 203.1 on the old one. The old run used different test images (only 24 shared), different
+  training images and a different probe, so compare the direction of the effects across the two groups, not their
+  sizes.</p>
+  <div class="panel table-wrap">
+    <table>
+      <thead><tr><th>Run</th><th class="num">Judged findings, full length</th>
+        <th class="num">Judged findings, matched</th><th class="num">Wrong objects / caption, matched</th>
+        <th class="num">Precision, matched</th><th class="num">Recall, matched</th><th class="num">RL tokens</th></tr></thead>
+      <tbody>
+<tr class="group"><td colspan="7">New data: 1,000 test images, two seeds</td></tr>
+<tr class=""><td>Seed 42, step 300</td><td class="num"><span class="d-good">−0.41</span><span class="ci">[−0.54, −0.28]</span></td><td class="num"><span class="">−0.06</span><span class="ci">[−0.18, +0.06]</span></td><td class="num"><span class="d-bad">+0.039</span><span class="ci">[+0.003, +0.076]</span></td><td class="num"><span class="">−0.6pp</span><span class="ci">[−1.7, +0.5]</span></td><td class="num"><span class="d-good">+2.1pp</span><span class="ci">[+0.9, +3.2]</span></td><td class="num">166.3</td></tr>
+<tr class=""><td>Seed 43, step 300</td><td class="num"><span class="d-good">−0.29</span><span class="ci">[−0.42, −0.15]</span></td><td class="num"><span class="">−0.00</span><span class="ci">[−0.12, +0.12]</span></td><td class="num"><span class="">+0.027</span><span class="ci">[−0.010, +0.064]</span></td><td class="num"><span class="">−0.4pp</span><span class="ci">[−1.5, +0.6]</span></td><td class="num"><span class="d-good">+1.3pp</span><span class="ci">[+0.3, +2.4]</span></td><td class="num">177.3</td></tr>
+<tr class=""><td>Seed 42, step 250</td><td class="num"><span class="d-good">−0.42</span><span class="ci">[−0.55, −0.28]</span></td><td class="num"><span class="">−0.05</span><span class="ci">[−0.17, +0.08]</span></td><td class="num"><span class="">+0.032</span><span class="ci">[−0.007, +0.072]</span></td><td class="num"><span class="">−0.3pp</span><span class="ci">[−1.4, +0.9]</span></td><td class="num"><span class="d-good">+2.6pp</span><span class="ci">[+1.4, +3.7]</span></td><td class="num">163.2</td></tr>
+<tr class=""><td>Seed 43, step 250</td><td class="num"><span class="d-good">−0.31</span><span class="ci">[−0.44, −0.17]</span></td><td class="num"><span class="">−0.03</span><span class="ci">[−0.15, +0.10]</span></td><td class="num"><span class="">+0.034</span><span class="ci">[−0.004, +0.073]</span></td><td class="num"><span class="">−0.7pp</span><span class="ci">[−1.8, +0.4]</span></td><td class="num"><span class="">+0.9pp</span><span class="ci">[−0.1, +2.0]</span></td><td class="num">177.5</td></tr>
+<tr class="group"><td colspan="7">Old run: 600 old test images, one seed</td></tr>
+<tr class=""><td>Step 250 (<code>ck250</code>)</td><td class="num"><span class="d-good">−0.60</span><span class="ci">[−0.79, −0.41]</span></td><td class="num"><span class="d-good">−0.38</span><span class="ci">[−0.54, −0.21]</span></td><td class="num"><span class="d-good">−0.068</span><span class="ci">[−0.118, −0.020]</span></td><td class="num"><span class="d-good">+2.5pp</span><span class="ci">[+1.0, +4.0]</span></td><td class="num"><span class="d-good">+1.6pp</span><span class="ci">[+0.3, +3.0]</span></td><td class="num">172.4</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="panel conclusion" style="margin-top:14px">
+    <h3>Reading it</h3>
+    <p>Every new checkpoint has fewer judged findings at full length, and none has fewer at matched length; wrong
+    objects and precision do not improve either. What does reproduce is recall at matched length: in the same number of
+    tokens, the RL model names more of the objects that are really there. The old run improved on all four at matched
+    length.</p>
+    <p style="margin:0" class="small muted">Caveats on the old row: one seed, and step 250 was chosen after step 300 had
+    failed the matched-length test.</p>
+  </div>
+
+  <h2 id="running">3. Running now</h2>
+  <div class="panel table-wrap">
+    <table>
+      <thead><tr><th>Run</th><th>What changes vs the seed-42 run above</th><th>What it tests</th></tr></thead>
+      <tbody>
+        <tr><td>A</td><td style="white-space:normal">Reward probe = the old run’s probe</td>
+          <td style="white-space:normal">Did the new probe cause the loss? The new probe’s claim head only looks at about
+          6% of the caption (the first mention of each COCO object); the old one looks at about 29%.</td></tr>
+        <tr><td>B</td><td style="white-space:normal">Same new probe; reward threshold θ 0.8 plus a risk penalty averaged
+          over the caption</td>
+          <td style="white-space:normal">A reward chosen offline because it ranks same-length captions better (58.8% vs
+          52.3% for the reward used above) and does not pay for stopping early.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small muted" style="margin-top:8px">Seed 42 each, same settings and GPU type as the runs above. Pass rules
+  were written down before training: judged findings and wrong objects both lower at matched length (CI below zero),
+  recall no worse than −1pp.</p>
+
+  <h2>4. Other methods (old 600-image test set)</h2>
+  <p class="muted small">Full-length captions, judge-free (computed with <code>baselines/spin/compare_judge_free.py</code>,
+  where CHAIR<sub>I</sub> is averaged per caption, so the numbers are not comparable with section 1). These methods have
+  not been rerun on the new data.</p>
+  <div class="panel table-wrap">
+    <table>
+      <thead><tr><th>Method</th><th class="num">Judged findings / caption ↓</th><th class="num">CHAIR<sub>S</sub> ↓</th>
+        <th class="num">CHAIR<sub>I</sub> ↓</th><th class="num">Wrong objects / caption ↓</th><th class="num">Recall ↑</th>
+        <th class="num">Precision ↑</th><th class="num">Tokens</th></tr></thead>
+      <tbody>
+<tr class="base"><td><strong>Base</strong> (no training)</td><td class="num">2.10</td><td class="num">41.7%</td><td class="num">16.7%</td><td class="num">0.586</td><td class="num">70.9%</td><td class="num">83.3%</td><td class="num">203.1</td></tr>
+<tr class=""><td>VCD</td><td class="num"><span class=muted>—</span></td><td class="num">48.1%</td><td class="num">19.0%</td><td class="num">0.683</td><td class="num">72.6%</td><td class="num">81.0%</td><td class="num">246.9</td></tr>
+<tr class=""><td>SPIN</td><td class="num"><span class=muted>—</span></td><td class="num">41.9%</td><td class="num">16.3%</td><td class="num">0.554</td><td class="num">71.8%</td><td class="num">83.7%</td><td class="num">223.8</td></tr>
+<tr class=""><td>PAI-attn</td><td class="num"><span class=muted>—</span></td><td class="num">46.6%</td><td class="num">17.6%</td><td class="num">0.686</td><td class="num">75.8%</td><td class="num">82.4%</td><td class="num">162.1</td></tr>
+<tr class=""><td>PAI</td><td class="num"><span class=muted>—</span></td><td class="num">48.9%</td><td class="num">18.7%</td><td class="num">0.706</td><td class="num">75.5%</td><td class="num">81.3%</td><td class="num">206.0</td></tr>
+<tr class=""><td>SIRA</td><td class="num"><span class=muted>—</span></td><td class="num">43.9%</td><td class="num">16.3%</td><td class="num">0.589</td><td class="num">72.4%</td><td class="num">83.7%</td><td class="num">191.2</td></tr>
+<tr class="ours"><td>Probe-reward RL, 750 steps</td><td class="num"><span class=muted>—</span></td><td class="num">31.4%</td><td class="num">13.4%</td><td class="num">0.384</td><td class="num">63.5%</td><td class="num">86.6%</td><td class="num">449.2</td></tr>
+<tr class="ours"><td>Probe-reward RL, step 250 (<code>ck250</code>)</td><td class="num">1.50</td><td class="num">33.9%</td><td class="num">13.3%</td><td class="num">0.439</td><td class="num">70.1%</td><td class="num">86.7%</td><td class="num">172.4</td></tr>
+<tr><td>CHAIR-DPO</td><td class="pending" colspan="7">implemented in <code>baselines/</code>; no results recorded yet</td></tr>
+<tr><td>PAPO</td><td class="pending" colspan="7">implemented in <code>baselines/</code>; no results recorded yet</td></tr>
+<tr><td>VES-RFT</td><td class="pending" colspan="7">implemented in <code>baselines/</code>; no results recorded yet</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small muted" style="margin-top:8px">VCD and PAI come out worse than the base model here, which contradicts
+  their papers; whether they were run at the authors’ settings has not been checked.</p>
+
+  <h2>5. Qwen2.5-VL-7B (old 600-image test set)</h2>
+  <p class="muted small">Same recipe as the old 3B run, one seed. Not yet run on the new data.</p>
+  <div class="panel table-wrap">
+    <table>
+      <thead><tr><th>Model</th><th class="num">Judged findings / caption ↓</th><th class="num">Δ full length</th>
+        <th class="num">Δ matched length</th></tr></thead>
+      <tbody>
+        <tr class="base"><td><strong>Base</strong> (no training)</td><td class="num">1.677</td><td></td><td></td></tr>
+        <tr><td>RL, same reward as the 3B run</td><td class="num">1.697</td><td class="num"><span class="">+0.02</span><span class="ci">[−0.13, +0.17]</span></td>
+          <td class="num"><span class="muted">—</span></td></tr>
+        <tr><td>RL, reward + risk rate, step 250</td><td class="num">1.268</td><td class="num"><span class="d-good">−0.41</span><span class="ci">[−0.55, −0.26]</span></td>
+          <td class="num"><span class="d-good">−0.28</span><span class="ci">[−0.42, −0.14]</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small muted" style="margin-top:8px">The risk-rate run crashed at step 287, so step 250 is evaluated; the
+  judge-free wrong-object count does not change at matched length.</p>
+
+  <footer>
+    Sources: <code>store/runs/v2_qwen25vl3b/eval/</code> (new data), <code>old_preliminary_results/analysis/qwen3b/</code>
+    and <code>docs/rl_checkpoint_evidence.md</code> (old run and other methods), <code>docs/qwen25vl7b_results.md</code>
+    (7B), in the probe-rl-hallucination repository. Judge: gpt-5.1 with the v3 prompt. Bootstrap: 10,000 paired draws.
+  </footer>
+</main>
+</body>
+</html>
