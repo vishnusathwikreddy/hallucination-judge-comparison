@@ -80,6 +80,8 @@ td.pending { color: var(--muted); font-style: italic; white-space: normal; }
 @media (max-width: 760px) { .status { grid-template-columns: 1fr; } }
 .status .panel h3 { font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
 .status .panel p { margin: 0; }
+.status .panel.win { border-color: var(--good); }
+@media (max-width: 640px) { td:first-child { white-space: normal; min-width: 8.5em; } }
 footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1px solid var(--border); padding-top: 14px; }
 </style>
 </head>
@@ -88,106 +90,172 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
   <nav class="top"><a class="here" href="qwen.html">Qwen results</a><a href="rate.html">Blind rating</a><a href="index.html">Judge comparison</a></nav>
   <h1>Qwen2.5-VL: probe-reward GRPO results</h1>
   <p class="lede">The base model, every RL run, and the other hallucination-reduction methods, in one place.
-  Updated 24 Oct 2026.</p>
+  Updated 24 Oct 2026, afternoon.</p>
 
   <div class="status">
-    <div class="panel"><h3>Old run (L40S)</h3><p>Fewer hallucinations than the base model
-    <strong>even at matched length</strong> (−0.38 judged findings per caption), on the old 600-image test set.</p></div>
-    <div class="panel"><h3>New data, two seeds</h3><p>Fewer findings only because captions got shorter:
-    <strong>no change at matched length</strong> in any of four checkpoints.</p></div>
-    <div class="panel"><h3>Running now</h3><p>Two runs that test why: the old probe on the new data (A), and the new
-    probe with a reshaped reward (B). <a href="#running">Details</a>.</p></div>
+    <div class="panel win"><h3>Object-probe reward (pmG)</h3><p>The first run on the new data with fewer hallucinations
+    <strong>at matched length</strong>: −0.59 judged findings per caption
+    (−29%), the same with a
+    hedge-strict judge, recall unchanged.</p></div>
+    <div class="panel"><h3>Earlier runs on the new data</h3><p>Published reward (two seeds), old probe (A), risk rate (B)
+    and the old L40S adapter: fewer findings mainly because captions got shorter; <strong>no fewer judged findings or wrong
+    objects at matched length</strong>.</p></div>
+    <div class="panel"><h3>Running now</h3><p>pmG with seeds 43 and 44, plus two ablations. One seed so far, so this is
+    not yet a replicated result. <a href="#running">Details</a>.</p></div>
   </div>
 
   <h2>How to read the tables</h2>
   <div class="panel">
     <dl class="defs">
       <dt>Base / RL</dt><dd>Qwen2.5-VL-3B-Instruct without training / after 300 GRPO steps with LoRA, where the only
-      reward is a probe on the model’s own hidden states. Step 300 was fixed as the main checkpoint before training.
-      Greedy captions.</dd>
+      reward is a probe on the frozen model’s hidden states. Greedy captions on 1,000 held-out COCO images.</dd>
       <dt>Matched length</dt><dd>Each base caption is cut to its paired RL caption’s token count. Shorter captions
       contain fewer errors, so this is the fair comparison: a model cannot win just by saying less.</dd>
       <dt>Judged findings</dt><dd>Errors per caption found by the gpt-5.1 judge: wrong objects, attributes, relations and
-      counts. Lower is better.</dd>
-      <dt>Judge-free</dt><dd>From the COCO object annotations, no judge. CHAIR<sub>S</sub>: share of captions naming at
-      least one object not in the image. CHAIR<sub>I</sub>: share of object mentions that are wrong
-      (precision = 1 − CHAIR<sub>I</sub>). Recall: share of the image’s annotated objects the caption names.</dd>
+      counts. The standard prompt never flags a hedged claim (“appears to be…”) unless the thing is clearly absent; the
+      <em>hedge-strict</em> prompt judges a hedged claim exactly as if it were stated plainly.</dd>
+      <dt>CHAIR</dt><dd>Standard CHAIR (Rohrbach et al., the <code>chair.py</code> used by OPERA): COCO segmentation and
+      caption ground truth. CHAIR<sub>S</sub>: share of captions naming at least one object not in the image.
+      CHAIR<sub>I</sub>: share of object mentions that are wrong. Recall: share of the image’s objects the caption
+      names. Wrong COCO objects per caption use our synonym matcher on the segmentation labels.</dd>
       <dt>Δ and CI</dt><dd>RL minus base, paired over images; 95% bootstrap interval underneath.
       <span class="d-good">Green</span>: the interval excludes zero and RL is better.
       <span class="d-bad">Red</span>: it excludes zero and RL is worse.</dd>
     </dl>
   </div>
 
-  <h2>1. Qwen2.5-VL-3B on the new data</h2>
-  <p class="muted small">1,000 held-out COCO test images (the <code>coco_v2</code> split); full-length captions.</p>
+  <h2>1. pmG against the base model</h2>
+  <p class="muted small">Seed 42, step 300 (the checkpoint fixed before training), 1,000 test images. The reward and why
+  it works are in section 3.</p>
   <div class="panel table-wrap">
     <table>
-      <thead><tr><th>Model</th><th class="num">Tokens</th><th class="num">Judged findings / caption ↓</th>
-        <th class="num">CHAIR<sub>S</sub> ↓</th><th class="num">CHAIR<sub>I</sub> ↓</th><th class="num">Recall ↑</th>
-        <th class="num">Objects named</th></tr></thead>
+      <thead><tr><th></th><th class="num">Base, full length</th><th class="num">pmG</th><th class="num">Δ full length</th>
+        <th class="num">Base cut to pmG’s length</th><th class="num">Δ matched length</th></tr></thead>
       <tbody>
-<tr class="base"><td><strong>Base</strong> (no training)</td><td class="num">203.5</td><td class="num">2.27</td><td class="num">41.4%</td><td class="num">20.0%</td><td class="num">72.7%</td><td class="num">2.97</td></tr>
-<tr class=""><td>RL, seed 42, step 300</td><td class="num">166.3</td><td class="num">1.86</td><td class="num">41.1%</td><td class="num">19.3%</td><td class="num">71.7%</td><td class="num">2.90</td></tr>
-<tr class=""><td>RL, seed 43, step 300</td><td class="num">177.3</td><td class="num">1.99</td><td class="num">39.2%</td><td class="num">19.4%</td><td class="num">71.8%</td><td class="num">2.90</td></tr>
-<tr class=""><td>RL, seed 42, step 250</td><td class="num">163.2</td><td class="num">1.86</td><td class="num">39.7%</td><td class="num">18.7%</td><td class="num">71.7%</td><td class="num">2.88</td></tr>
-<tr class=""><td>RL, seed 43, step 250</td><td class="num">177.5</td><td class="num">1.97</td><td class="num">41.2%</td><td class="num">19.9%</td><td class="num">71.4%</td><td class="num">2.91</td></tr>
-<tr><td>RL, run A: old probe (seed 42)</td><td class="pending" colspan="6">training now; results after judging</td></tr>
-<tr><td>RL, run B: new probe + risk rate (seed 42)</td><td class="pending" colspan="6">training now; results after judging</td></tr>
+<tr><td>Tokens</td><td class="num">203.5</td><td class="num"><strong>178.8</strong></td><td class="num"><span class="">−24.7</span><span class="ci">[−28.5, −20.9]</span></td><td class="num">167.3</td><td class="num"><span class="">+11.5</span><span class="ci">[+9.6, +13.5]</span></td></tr>
+<tr><td>Judged findings / caption ↓</td><td class="num">2.27</td><td class="num"><strong>1.44</strong></td><td class="num"><span class="d-good">−0.83</span><span class="ci">[−0.96, −0.71]</span></td><td class="num">2.03</td><td class="num"><span class="d-good">−0.59</span><span class="ci">[−0.71, −0.47]</span></td></tr>
+<tr><td>Judged findings / caption, hedge-strict judge ↓</td><td class="num"><span class="muted">—</span></td><td class="num"><strong>1.57</strong></td><td class="num"><span class="muted">—</span></td><td class="num">2.17</td><td class="num"><span class="d-good">−0.60</span><span class="ci">[−0.72, −0.48]</span></td></tr>
+<tr><td>Clean captions (no judged finding) ↑</td><td class="num">31.5%</td><td class="num"><strong>47.3%</strong></td><td class="num"><span class="d-good">+15.8pp</span><span class="ci">McNemar p = 3×10<sup>-18</sup></span></td><td class="num">34.0%</td><td class="num"><span class="d-good">+13.3pp</span><span class="ci">McNemar p = 7×10<sup>-13</sup></span></td></tr>
+<tr><td>CHAIR<sub>S</sub> ↓</td><td class="num">41.9%</td><td class="num"><strong>33.1%</strong></td><td class="num"><span class="d-good">−8.8pp</span><span class="ci">[−11.9, −5.8]</span></td><td class="num">36.6%</td><td class="num"><span class="d-good">−3.5pp</span><span class="ci">[−6.5, −0.5]</span></td></tr>
+<tr><td>CHAIR<sub>I</sub> ↓</td><td class="num">9.2%</td><td class="num"><strong>7.0%</strong></td><td class="num"><span class="d-good">−2.2pp</span><span class="ci">[−2.9, −1.5]</span></td><td class="num">8.9%</td><td class="num"><span class="d-good">−1.9pp</span><span class="ci">[−2.6, −1.2]</span></td></tr>
+<tr><td>Wrong COCO objects / caption ↓</td><td class="num">0.593</td><td class="num"><strong>0.454</strong></td><td class="num"><span class="d-good">−0.139</span><span class="ci">[−0.179, −0.100]</span></td><td class="num">0.519</td><td class="num"><span class="d-good">−0.065</span><span class="ci">[−0.102, −0.029]</span></td></tr>
+<tr><td>Recall ↑</td><td class="num">70.5%</td><td class="num"><strong>66.3%</strong></td><td class="num"><span class="d-bad">−4.2pp</span><span class="ci">[−5.4, −3.1]</span></td><td class="num">67.3%</td><td class="num"><span class="">−1.0pp</span><span class="ci">[−2.2, +0.2]</span></td></tr>
       </tbody>
     </table>
   </div>
-
-  <h2>2. RL minus base: is the gain more than shorter captions?</h2>
-  <p class="muted small">Base: 2.27 findings per caption and 203.5 tokens on the new test set;
-  2.10 and 203.1 on the old one. The old run used different test images (only 24 shared), different
-  training images and a different probe, so compare the direction of the effects across the two groups, not their
-  sizes.</p>
+  <p class="small muted" style="margin-top:8px">The cut base averages fewer tokens than pmG because a base caption that is
+  already shorter than pmG’s cannot be lengthened; that favours the base. The hedge-strict judge was run at matched length
+  only.</p>
+  <p class="muted small" style="margin-top:14px">Captions by number of judged findings (standard judge):</p>
   <div class="panel table-wrap">
     <table>
-      <thead><tr><th>Run</th><th class="num">Judged findings, full length</th>
-        <th class="num">Judged findings, matched</th><th class="num">Wrong objects / caption, matched</th>
-        <th class="num">Precision, matched</th><th class="num">Recall, matched</th><th class="num">RL tokens</th></tr></thead>
+      <thead><tr><th></th><th class="num">0</th><th class="num">1</th><th class="num">2</th><th class="num">3</th>
+        <th class="num">4 or more</th></tr></thead>
       <tbody>
-<tr class="group"><td colspan="7">New data: 1,000 test images, two seeds</td></tr>
-<tr class=""><td>Seed 42, step 300</td><td class="num"><span class="d-good">−0.41</span><span class="ci">[−0.54, −0.28]</span></td><td class="num"><span class="">−0.06</span><span class="ci">[−0.18, +0.06]</span></td><td class="num"><span class="d-bad">+0.039</span><span class="ci">[+0.003, +0.076]</span></td><td class="num"><span class="">−0.6pp</span><span class="ci">[−1.7, +0.5]</span></td><td class="num"><span class="d-good">+2.1pp</span><span class="ci">[+0.9, +3.2]</span></td><td class="num">166.3</td></tr>
-<tr class=""><td>Seed 43, step 300</td><td class="num"><span class="d-good">−0.29</span><span class="ci">[−0.42, −0.15]</span></td><td class="num"><span class="">−0.00</span><span class="ci">[−0.12, +0.12]</span></td><td class="num"><span class="">+0.027</span><span class="ci">[−0.010, +0.064]</span></td><td class="num"><span class="">−0.4pp</span><span class="ci">[−1.5, +0.6]</span></td><td class="num"><span class="d-good">+1.3pp</span><span class="ci">[+0.3, +2.4]</span></td><td class="num">177.3</td></tr>
-<tr class=""><td>Seed 42, step 250</td><td class="num"><span class="d-good">−0.42</span><span class="ci">[−0.55, −0.28]</span></td><td class="num"><span class="">−0.05</span><span class="ci">[−0.17, +0.08]</span></td><td class="num"><span class="">+0.032</span><span class="ci">[−0.007, +0.072]</span></td><td class="num"><span class="">−0.3pp</span><span class="ci">[−1.4, +0.9]</span></td><td class="num"><span class="d-good">+2.6pp</span><span class="ci">[+1.4, +3.7]</span></td><td class="num">163.2</td></tr>
-<tr class=""><td>Seed 43, step 250</td><td class="num"><span class="d-good">−0.31</span><span class="ci">[−0.44, −0.17]</span></td><td class="num"><span class="">−0.03</span><span class="ci">[−0.15, +0.10]</span></td><td class="num"><span class="">+0.034</span><span class="ci">[−0.004, +0.073]</span></td><td class="num"><span class="">−0.7pp</span><span class="ci">[−1.8, +0.4]</span></td><td class="num"><span class="">+0.9pp</span><span class="ci">[−0.1, +2.0]</span></td><td class="num">177.5</td></tr>
-<tr class="group"><td colspan="7">Old run: 600 old test images, one seed</td></tr>
-<tr class=""><td>Step 250 (<code>ck250</code>)</td><td class="num"><span class="d-good">−0.60</span><span class="ci">[−0.79, −0.41]</span></td><td class="num"><span class="d-good">−0.38</span><span class="ci">[−0.54, −0.21]</span></td><td class="num"><span class="d-good">−0.068</span><span class="ci">[−0.118, −0.020]</span></td><td class="num"><span class="d-good">+2.5pp</span><span class="ci">[+1.0, +4.0]</span></td><td class="num"><span class="d-good">+1.6pp</span><span class="ci">[+0.3, +3.0]</span></td><td class="num">172.4</td></tr>
+<tr class="base"><td>Base, full length</td><td class="num">315</td><td class="num">112</td><td class="num">162</td><td class="num">128</td><td class="num">283</td></tr>
+<tr class=""><td>Base, cut to pmG’s length</td><td class="num">340</td><td class="num">131</td><td class="num">160</td><td class="num">139</td><td class="num">230</td></tr>
+<tr class="ours"><td><strong>pmG</strong></td><td class="num">473</td><td class="num">131</td><td class="num">147</td><td class="num">117</td><td class="num">132</td></tr>
       </tbody>
     </table>
   </div>
   <div class="panel conclusion" style="margin-top:14px">
     <h3>Reading it</h3>
-    <p>Every new checkpoint has fewer judged findings at full length, and none has fewer at matched length; wrong
-    objects and precision do not improve either. What does reproduce is recall at matched length: in the same number of
-    tokens, the RL model names more of the objects that are really there. The old run improved on all four at matched
-    length.</p>
-    <p style="margin:0" class="small muted">Caveats on the old row: one seed, and step 250 was chosen after step 300 had
-    failed the matched-length test.</p>
+    <p>pmG is about 12% shorter than the base model, and that alone removes some errors: cutting the base caption to
+    pmG’s length lowers judged findings by 0.24 per caption. pmG removes 0.59 more at the same length, with
+    no loss of recall there. Recall falls only at full length, because the base model’s extra tail names a few more real
+    objects as well as most of its extra errors. The hedge-strict judge finds the same gap, so the gain is not the judge
+    forgiving hedged wording.</p>
+    <p style="margin:0" class="small muted">Caveats: one seed (43 and 44 are training); pmG was the best of three
+    object-probe configurations evaluated (pmF, pmG, pmH); its shortening comes from the risk term rewarding a safe
+    closing sentence, which a later version should remove.</p>
   </div>
 
-  <h2 id="running">3. Running now</h2>
+  <h2>2. Every run on the new data: RL minus base</h2>
+  <p class="muted small">Base: 2.27 judged findings per caption and 203.5 tokens. Matched-length columns
+  compare each run with the base cut to that run’s caption lengths.</p>
   <div class="panel table-wrap">
     <table>
-      <thead><tr><th>Run</th><th>What changes vs the seed-42 run above</th><th>What it tests</th></tr></thead>
+      <thead><tr><th>Run</th><th class="num">Judged findings, full length</th><th class="num">Judged findings, matched</th>
+        <th class="num">CHAIR<sub>S</sub>, matched</th><th class="num">CHAIR<sub>I</sub>, matched</th>
+        <th class="num">Wrong objects / caption, matched</th><th class="num">Recall, matched</th>
+        <th class="num">RL tokens</th></tr></thead>
       <tbody>
-        <tr><td>A</td><td style="white-space:normal">Reward probe = the old run’s probe</td>
-          <td style="white-space:normal">Did the new probe cause the loss? The new probe’s claim head only looks at about
-          6% of the caption (the first mention of each COCO object); the old one looks at about 29%.</td></tr>
-        <tr><td>B</td><td style="white-space:normal">Same new probe; reward threshold θ 0.8 plus a risk penalty averaged
-          over the caption</td>
-          <td style="white-space:normal">A reward chosen offline because it ranks same-length captions better (58.8% vs
-          52.3% for the reward used above) and does not pay for stopping early.</td></tr>
+<tr class="group"><td colspan="8">Earlier rewards (no length control, lr 1e-5)</td></tr>
+<tr class=""><td>Published reward, seed 42</td><td class="num"><span class="d-good">−0.41</span><span class="ci">[−0.54, −0.28]</span></td><td class="num"><span class="">−0.06</span><span class="ci">[−0.18, +0.06]</span></td><td class="num"><span class="">+2.4pp</span><span class="ci">[−0.5, +5.1]</span></td><td class="num"><span class="">−0.2pp</span><span class="ci">[−0.9, +0.5]</span></td><td class="num"><span class="d-bad">+0.039</span><span class="ci">[+0.003, +0.076]</span></td><td class="num"><span class="d-good">+2.2pp</span><span class="ci">[+1.0, +3.4]</span></td><td class="num">166.3</td></tr>
+<tr class=""><td>Published reward, seed 43</td><td class="num"><span class="d-good">−0.29</span><span class="ci">[−0.42, −0.15]</span></td><td class="num"><span class="">−0.00</span><span class="ci">[−0.12, +0.12]</span></td><td class="num"><span class="">+0.0pp</span><span class="ci">[−2.8, +2.5]</span></td><td class="num"><span class="">−0.6pp</span><span class="ci">[−1.3, +0.1]</span></td><td class="num"><span class="">+0.027</span><span class="ci">[−0.010, +0.064]</span></td><td class="num"><span class="d-good">+1.4pp</span><span class="ci">[+0.3, +2.5]</span></td><td class="num">177.3</td></tr>
+<tr class=""><td>Run A: old L40S probe</td><td class="num"><span class="muted">not judged</span></td><td class="num"><span class="muted">not judged</span></td><td class="num"><span class="">−1.3pp</span><span class="ci">[−4.2, +1.5]</span></td><td class="num"><span class="d-good">−0.8pp</span><span class="ci">[−1.5, −0.0]</span></td><td class="num"><span class="">−0.012</span><span class="ci">[−0.050, +0.026]</span></td><td class="num"><span class="">+0.3pp</span><span class="ci">[−0.9, +1.5]</span></td><td class="num">162.7</td></tr>
+<tr class=""><td>Run B: new probe + risk rate</td><td class="num"><span class="muted">not judged</span></td><td class="num"><span class="muted">not judged</span></td><td class="num"><span class="">+0.5pp</span><span class="ci">[−2.4, +3.2]</span></td><td class="num"><span class="d-good">−1.1pp</span><span class="ci">[−1.8, −0.3]</span></td><td class="num"><span class="">+0.010</span><span class="ci">[−0.028, +0.049]</span></td><td class="num"><span class="d-good">+3.0pp</span><span class="ci">[+1.8, +4.2]</span></td><td class="num">160.6</td></tr>
+<tr class=""><td>Old L40S adapter (<code>ck250</code>) on this test set</td><td class="num"><span class="muted">not judged</span></td><td class="num"><span class="muted">not judged</span></td><td class="num"><span class="">−0.6pp</span><span class="ci">[−3.6, +2.5]</span></td><td class="num"><span class="">−0.7pp</span><span class="ci">[−1.5, +0.0]</span></td><td class="num"><span class="">−0.006</span><span class="ci">[−0.045, +0.031]</span></td><td class="num"><span class="">+0.5pp</span><span class="ci">[−0.7, +1.7]</span></td><td class="num">169.1</td></tr>
+<tr class="group"><td colspan="8">Object-probe rewards, length-matched GRPO (seed 42)</td></tr>
+<tr class="ours"><td>pmF: object head, lr 2e-5</td><td class="num"><span class="muted">not judged</span></td><td class="num"><span class="muted">not judged</span></td><td class="num"><span class="">+0.9pp</span><span class="ci">[−1.6, +3.4]</span></td><td class="num"><span class="">−0.3pp</span><span class="ci">[−0.9, +0.2]</span></td><td class="num"><span class="">+0.025</span><span class="ci">[−0.011, +0.060]</span></td><td class="num"><span class="">−0.1pp</span><span class="ci">[−1.1, +1.0]</span></td><td class="num">204.8</td></tr>
+<tr class="ours"><td><strong>pmG</strong>: object head + judge-head risk, lr 2e-5</td><td class="num"><span class="d-good">−0.83</span><span class="ci">[−0.96, −0.71]</span></td><td class="num"><span class="d-good">−0.59</span><span class="ci">[−0.71, −0.47]</span></td><td class="num"><span class="d-good">−3.5pp</span><span class="ci">[−6.5, −0.5]</span></td><td class="num"><span class="d-good">−1.9pp</span><span class="ci">[−2.6, −1.2]</span></td><td class="num"><span class="d-good">−0.065</span><span class="ci">[−0.102, −0.029]</span></td><td class="num"><span class="">−0.8pp</span><span class="ci">[−2.1, +0.5]</span></td><td class="num">178.8</td></tr>
+<tr class="ours"><td>pmG, step 250</td><td class="num"><span class="muted">not judged</span></td><td class="num"><span class="muted">not judged</span></td><td class="num"><span class="d-good">−4.3pp</span><span class="ci">[−7.2, −1.4]</span></td><td class="num"><span class="d-good">−1.9pp</span><span class="ci">[−2.5, −1.2]</span></td><td class="num"><span class="d-good">−0.074</span><span class="ci">[−0.112, −0.036]</span></td><td class="num"><span class="">+0.0pp</span><span class="ci">[−1.2, +1.2]</span></td><td class="num">177.5</td></tr>
+<tr class="ours"><td>pmH: object head, lr 5e-5</td><td class="num"><span class="muted">not judged</span></td><td class="num"><span class="muted">not judged</span></td><td class="num"><span class="">−2.4pp</span><span class="ci">[−5.2, +0.3]</span></td><td class="num"><span class="d-good">−1.3pp</span><span class="ci">[−2.0, −0.6]</span></td><td class="num"><span class="d-good">−0.040</span><span class="ci">[−0.078, −0.002]</span></td><td class="num"><span class="d-bad">−1.2pp</span><span class="ci">[−2.3, −0.1]</span></td><td class="num">191.8</td></tr>
       </tbody>
     </table>
   </div>
-  <p class="small muted" style="margin-top:8px">Seed 42 each, same settings and GPU type as the runs above. Pass rules
-  were written down before training: judged findings and wrong objects both lower at matched length (CI below zero),
-  recall no worse than −1pp.</p>
+  <p class="small muted" style="margin-top:8px">At matched length, seed 42 of the published reward names significantly
+  more wrong COCO objects than the base model. Runs A and B lower CHAIR<sub>I</sub> slightly without fewer wrong objects
+  per caption. pmG is the only run that lowers judged findings, CHAIR<sub>S</sub>, CHAIR<sub>I</sub> and wrong objects
+  at matched length.</p>
 
-  <h2>4. Other methods (old 600-image test set)</h2>
+  <h2>3. What changed</h2>
+  <div class="panel">
+    <dl class="defs">
+      <dt>The probe was not the bottleneck</dt><dd>Against an independent second judge run, the existing hallucination
+      probe already ranks same-length captions of an image at 0.665, next to the judge’s agreement with itself (0.70).
+      Bigger probes, context and other labels did not move it.</dd>
+      <dt>The reward shape was</dt><dd>The published reward pays for every object a caption names, so among captions of
+      the same length it prefers the one with <em>more</em> wrong objects (table below).</dd>
+      <dt>An object probe</dt><dd>A new head on the same hidden states, trained on COCO ground truth for the groups that
+      first name an object: is this object in the image? AUROC 0.93 on held-out images, against 0.66 for the
+      judge-trained head on the same mentions (0.72 from caption position alone, 0.59 from the object category alone).</dd>
+      <dt>Length-matched GRPO</dt><dd>Each sampled caption is scored against the other captions of the same image cut
+      to its own length, so stopping early earns nothing; this is the matched-length evaluation applied inside
+      training.</dd>
+    </dl>
+  </div>
+  <p class="muted small" style="margin-top:14px">How each reward ranks pairs of same-length captions of one image
+  (held-out sampled captions; 0.5 = chance), and whether replacing a caption with filler of the same length would pay
+  (<code>src/eval/reward_rank_matched.py</code>):</p>
+  <div class="panel table-wrap">
+    <table>
+      <thead><tr><th>Reward</th><th class="num">Ranks by wrong COCO objects</th><th class="num">Ranks by judged findings</th>
+        <th class="num">Filler instead of content</th></tr></thead>
+      <tbody>
+<tr class=""><td>Published reward (seeds 42, 43)</td><td class="num"><span class="d-bad">0.46</span></td><td class="num"><span class="">0.53</span></td><td class="num">costs</td></tr>
+<tr class=""><td>Run A: old L40S probe</td><td class="num"><span class="">0.54</span></td><td class="num"><span class="d-good">0.60</span></td><td class="num">≈ neutral</td></tr>
+<tr class=""><td>Run B: risk rate</td><td class="num"><span class="d-bad">0.46</span></td><td class="num"><span class="">0.59</span></td><td class="num">costs</td></tr>
+<tr class=""><td>Judge head, strict object gate</td><td class="num"><span class="d-good">0.64</span></td><td class="num"><span class="">0.55</span></td><td class="num">pays</td></tr>
+<tr class="ours"><td>pmF / pmH: object head</td><td class="num"><span class="d-good">0.69</span></td><td class="num"><span class="">0.53</span></td><td class="num">costs</td></tr>
+<tr class="ours"><td><strong>pmG</strong>: object head + judge-head risk</td><td class="num"><span class="d-good">0.66</span></td><td class="num"><span class="d-good">0.60</span></td><td class="num">≈ neutral</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small muted" style="margin-top:8px">Picking the reward’s favourite of each image’s 8 sampled captions (all cut
+  to 150 tokens): the published reward picks captions with 22% more wrong objects than a random pick; the object-probe
+  reward picks ones with 37% fewer wrong objects and more correct ones.</p>
+
+  <h2 id="running">4. Running now</h2>
+  <div class="panel table-wrap">
+    <table>
+      <thead><tr><th>Run</th><th>What changes vs pmG</th><th>What it tests</th></tr></thead>
+      <tbody>
+        <tr><td>pmG, seed 43</td><td style="white-space:normal">Seed only</td>
+          <td style="white-space:normal">Does the gain replicate?</td></tr>
+        <tr><td>pmG, seed 44</td><td style="white-space:normal">Seed only</td>
+          <td style="white-space:normal">Does the gain replicate?</td></tr>
+        <tr><td>No length control</td><td style="white-space:normal">Plain GRPO advantages instead of length-matched</td>
+          <td style="white-space:normal">Is the length-matched training needed?</td></tr>
+        <tr><td>Judge head</td><td style="white-space:normal">The judge-trained head prices objects instead of the
+          object probe</td><td style="white-space:normal">Is the better probe needed?</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small muted" style="margin-top:8px">All four will be judged with the standard judge; the two seeds also with
+  the hedge-strict judge.</p>
+
+  <h2>5. Other methods (old 600-image test set)</h2>
   <p class="muted small">Full-length captions, judge-free (computed with <code>baselines/spin/compare_judge_free.py</code>,
   where CHAIR<sub>I</sub> is averaged per caption, so the numbers are not comparable with section 1). These methods have
   not been rerun on the new data.</p>
@@ -214,7 +282,7 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
   <p class="small muted" style="margin-top:8px">VCD and PAI come out worse than the base model here, which contradicts
   their papers; whether they were run at the authors’ settings has not been checked.</p>
 
-  <h2>5. Qwen2.5-VL-7B (old 600-image test set)</h2>
+  <h2>6. Qwen2.5-VL-7B (old 600-image test set)</h2>
   <p class="muted small">Same recipe as the old 3B run, one seed. Not yet run on the new data.</p>
   <div class="panel table-wrap">
     <table>
@@ -233,9 +301,11 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
   judge-free wrong-object count does not change at matched length.</p>
 
   <footer>
-    Sources: <code>store/runs/v2_qwen25vl3b/eval/</code> (new data), <code>old_preliminary_results/analysis/qwen3b/</code>
-    and <code>docs/rl_checkpoint_evidence.md</code> (old run and other methods), <code>docs/qwen25vl7b_results.md</code>
-    (7B), in the probe-rl-hallucination repository. Judge: gpt-5.1 with the v3 prompt. Bootstrap: 10,000 paired draws.
+    Sources: <code>store/runs/v2_qwen25vl3b/eval/</code> and <code>.../analysis/</code> (new data),
+    <code>docs/qwen3b_object_probe_overnight.md</code> (pmG and the object probe),
+    <code>old_preliminary_results/analysis/qwen3b/</code> and <code>docs/rl_checkpoint_evidence.md</code> (old run and other
+    methods), <code>docs/qwen25vl7b_results.md</code> (7B), in the probe-rl-hallucination repository. Judge: gpt-5.1 with
+    the v3 prompt (hedge-strict: <code>judge_v3_nohedge.txt</code>). Bootstrap: 10,000 paired draws.
   </footer>
 </main>
 </body>

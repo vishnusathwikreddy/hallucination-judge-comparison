@@ -112,9 +112,10 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
   <div class="panel conclusion" style="margin-bottom:40px">
     <h3>GRPO results</h3>
     <p style="margin:0">The base model, every RL run and the other methods for Qwen2.5-VL now have their own page:
-    <a href="qwen.html"><strong>Qwen results</strong></a>. In short: on the new data the probe reward cuts judged
-    hallucinations only by shortening captions (no change at matched length, two seeds), unlike the old run; two runs
-    testing why are training now.</p>
+    <a href="qwen.html"><strong>Qwen results</strong></a>. In short: the published probe reward cut judged
+    hallucinations on the new data only by shortening captions. A new object-probe reward with length-matched training
+    (pmG) is the first to reduce them at matched length: about 29% fewer judged findings per caption, also with a
+    hedge-strict judge, recall unchanged. One seed so far; seeds 43 and 44 are training.</p>
   </div>
 
   <h1>Which model should label hallucinations?</h1>
