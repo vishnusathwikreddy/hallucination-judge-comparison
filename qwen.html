@@ -87,10 +87,10 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
 <body>
 <main>
   <nav class="top"><a class="here" href="qwen.html">Qwen results</a><a href="rate.html">Blind rating</a><a href="index.html">Judge comparison</a></nav>
-  <h1>Qwen2.5-VL-3B: probe-reward GRPO</h1>
-  <p class="lede">The numbers for the paper: the final reward (pmG) over three seeds, its two ablations, what the
-  removed errors are, and capability on three out-of-distribution benchmarks. Captioning on 1,000 held-out COCO images.
-  Updated 25 Oct 2026.</p>
+  <h1>Qwen2.5-VL: probe-reward GRPO</h1>
+  <p class="lede">The numbers for the paper: on Qwen2.5-VL-3B, the final reward (pmG) over three seeds, its two
+  ablations, what the removed errors are, and capability on three out-of-distribution benchmarks; then the same recipe on
+  Qwen2.5-VL-7B (section 6, 2 of 3 seeds so far). Captioning on 1,000 held-out COCO images. Updated 25 Oct 2026.</p>
 
   <div class="status">
     <div class="panel win"><h3>Main result, 3 seeds</h3><p>At matched length, −0.55 judged findings per
@@ -230,7 +230,38 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
   The models do not learn to abstain: every pmG CountBench answer contains a number, and SAT answers that match no option
   stay at 2.5% for base and at most 2.7% for pmG.</p>
 
-  <h2>6. Method</h2>
+  <h2>6. Qwen2.5-VL-7B: the same recipe on a larger model</h2>
+  <p class="muted small">Same reward parameters, GRPO settings and evaluation as for Qwen2.5-VL-3B; the probes are trained
+  the same way on the 7B model’s own hidden states (layer 21). The 7B base already makes fewer errors:
+  1.52 judged findings per caption and 44.2% clean captions at full length, against
+  2.27 and 31.5% for 3B. Before training, pmG’s reward prefers the caption with fewer wrong
+  COCO objects 66% of the time (3B: 66%), and the object
+  probe’s AUROC is 0.92. Seed 44 has not been run yet. No hedge-strict judging for 7B.</p>
+  <div class="panel table-wrap">
+    <table>
+      <thead><tr><th></th><th class="num">Judged findings, matched</th><th class="num">Clean captions, matched</th>
+        <th class="num">CHAIR<sub>S</sub>, matched</th><th class="num">CHAIR<sub>I</sub>, matched</th>
+        <th class="num">Wrong objects, matched</th><th class="num">Recall, matched</th>
+        <th class="num">Judged findings, full length</th><th class="num">Tokens vs base</th></tr></thead>
+      <tbody>
+<tr class="ours"><td>pmG, seed 42</td><td class="num"><span class="d-good">−0.28</span><span class="ci">[−0.38, −0.17]</span></td><td class="num"><span class="d-good">+5.8pp</span><span class="ci">48.7 → 54.5%, p = 0.002</span></td><td class="num"><span class="">−1.9pp</span><span class="ci">[−4.6, +0.6]</span></td><td class="num"><span class="">−0.3pp</span><span class="ci">[−1.0, +0.4]</span></td><td class="num"><span class="">−0.018</span><span class="ci">[−0.050, +0.014]</span></td><td class="num"><span class="">+0.5pp</span><span class="ci">[−0.5, +1.4]</span></td><td class="num"><span class="d-good">−0.45</span><span class="ci">[−0.56, −0.34]</span></td><td class="num"><span class="">−31</span><span class="ci">[−34, −29]</span></td></tr>
+<tr class="ours"><td>pmG, seed 43</td><td class="num"><span class="">−0.09</span><span class="ci">[−0.20, +0.02]</span></td><td class="num"><span class="d-good">+5.1pp</span><span class="ci">47.1 → 52.2%, p = 0.005</span></td><td class="num"><span class="">+1.4pp</span><span class="ci">[−1.3, +3.9]</span></td><td class="num"><span class="">−0.1pp</span><span class="ci">[−0.7, +0.5]</span></td><td class="num"><span class="">+0.015</span><span class="ci">[−0.017, +0.048]</span></td><td class="num"><span class="">+0.7pp</span><span class="ci">[−0.2, +1.7]</span></td><td class="num"><span class="d-good">−0.21</span><span class="ci">[−0.33, −0.09]</span></td><td class="num"><span class="">−18</span><span class="ci">[−20, −16]</span></td></tr>
+<tr class="mean"><td><strong>Mean of 2 seeds</strong></td><td class="num"><span class="">−0.18</span><span class="ci">± 0.13 (sd)</span></td><td class="num"><span class="d-good">+5.5pp</span><span class="ci">± 0.5 (sd)</span></td><td class="num"><span class="">−0.3pp</span><span class="ci">± 2.3 (sd)</span></td><td class="num"><span class="">−0.2pp</span><span class="ci">± 0.1 (sd)</span></td><td class="num"><span class="">−0.002</span><span class="ci">± 0.023 (sd)</span></td><td class="num"><span class="">+0.6pp</span><span class="ci">± 0.2 (sd)</span></td><td class="num"><span class="d-good">−0.33</span><span class="ci">± 0.17 (sd)</span></td><td class="num"><span class="">−25</span><span class="ci">± 9 (sd)</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="panel conclusion" style="margin-top:14px">
+    <h3>Reading it</h3>
+    <p>Both seeds lower judged findings per caption at matched length
+    (−0.28, −20% and −0.09, −7%), significant on 1 of 2
+    (on 3B every seed gave −0.53 to −0.59), and both raise the share of clean captions
+    significantly (McNemar p = 0.002, p = 0.005). The judge-free
+    object metrics (CHAIR, wrong objects) do not change significantly on either seed, and recall at matched length does not
+    fall. The transfer holds in direction but is smaller and less consistent than on 3B, where the base had more errors to
+    remove.</p>
+  </div>
+
+  <h2>7. Method</h2>
   <div class="panel">
     <dl class="defs">
       <dt>Reward</dt><dd>R = Σ max(0, c − 0.35)·(0.3 − h) − 0.1·Σ max(0, r − 0.35), over five-token groups of the caption,
@@ -251,7 +282,8 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
 
   <footer>
     Sources: <code>store/runs/v2_qwen25vl3b/eval/pmG/s4{2,3,4}</code>, <code>.../pmGnp/s42</code>,
-    <code>.../pmGjh/s42</code> and <code>.../analysis/</code> (OOD: <code>.../analysis/ood/</code>); write-up in <code>docs/qwen3b_object_probe_overnight.md</code>,
+    <code>.../pmGjh/s42</code> and <code>.../analysis/</code> (OOD: <code>.../analysis/ood/</code>);
+    7B: <code>store/runs/v2_qwen25vl7b/eval/pmG/s4{2,3}</code> and <code>.../analysis/</code>; write-up in <code>docs/qwen3b_object_probe_overnight.md</code>,
     in the probe-rl-hallucination repository. Judge: gpt-5.1 with the v3 prompt (hedge-strict:
     <code>judge_v3_nohedge.txt</code>).
   </footer>
