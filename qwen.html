@@ -88,8 +88,9 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
 <main>
   <nav class="top"><a class="here" href="qwen.html">Qwen results</a><a href="rate.html">Blind rating</a><a href="index.html">Judge comparison</a></nav>
   <h1>Qwen2.5-VL-3B: probe-reward GRPO</h1>
-  <p class="lede">The numbers for the paper: the final reward (pmG) over three seeds, its two ablations, and what the
-  removed errors are. 1,000 held-out COCO images. Updated 24 Oct 2026, evening.</p>
+  <p class="lede">The numbers for the paper: the final reward (pmG) over three seeds, its two ablations, what the
+  removed errors are, and capability on three out-of-distribution benchmarks. Captioning on 1,000 held-out COCO images.
+  Updated 25 Oct 2026.</p>
 
   <div class="status">
     <div class="panel win"><h3>Main result, 3 seeds</h3><p>At matched length, −0.55 judged findings per
@@ -204,7 +205,32 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
   COCO objects named falls 3%: that part is more accurate captions. The judge does not penalise omissions,
   so it cannot price this trade-off by itself.</p>
 
-  <h2>5. Method</h2>
+  <h2>5. Capability outside captioning</h2>
+  <p class="muted small">Does RL on the captioning reward cost other abilities? Each benchmark is scored with its official
+  metric: CountBench, exact count (491 questions); SAT, multiple-choice accuracy (3,000 train+val questions), and a strict
+  version that gives no credit to an answer matching several options; MTVQA, the reference answer must appear in the
+  response (6,778 test questions), over all questions and averaged over its 9 languages. Greedy decoding, up to 64 new
+  tokens. Accuracy of each model, with the change from base and the exact McNemar p-value on the questions where the two
+  disagree underneath.</p>
+  <div class="panel table-wrap">
+    <table>
+      <thead><tr><th></th><th class="num">CountBench</th><th class="num">SAT</th><th class="num">SAT, strict</th>
+        <th class="num">MTVQA, all questions</th><th class="num">MTVQA, language average</th></tr></thead>
+      <tbody>
+<tr class="base"><td>Base (no training)</td><td class="num">70.9%</td><td class="num">65.9%</td><td class="num">63.4%</td><td class="num">23.8%</td><td class="num">22.0%</td></tr>
+<tr class="ours"><td>pmG, seed 42</td><td class="num">70.7%<span class="ci"><span class="">−0.2pp, p = 1.00</span></span></td><td class="num">65.6%<span class="ci"><span class="">−0.3pp, p = 0.47</span></span></td><td class="num">63.0%<span class="ci"><span class="">−0.4pp, p = 0.25</span></span></td><td class="num">23.7%<span class="ci"><span class="">−0.1pp, p = 0.49</span></span></td><td class="num">21.9%<span class="ci"><span class="">−0.1pp</span></span></td></tr>
+<tr class="ours"><td>pmG, seed 43</td><td class="num">71.1%<span class="ci"><span class="">+0.2pp, p = 1.00</span></span></td><td class="num">65.4%<span class="ci"><span class="">−0.5pp, p = 0.14</span></span></td><td class="num">62.6%<span class="ci"><span class="d-bad">−0.8pp, p = 0.02</span></span></td><td class="num">23.8%<span class="ci"><span class="">+0.1pp, p = 0.65</span></span></td><td class="num">22.1%<span class="ci"><span class="">+0.1pp</span></span></td></tr>
+<tr class="ours"><td>pmG, seed 44</td><td class="num">70.7%<span class="ci"><span class="">−0.2pp, p = 1.00</span></span></td><td class="num">65.5%<span class="ci"><span class="">−0.4pp, p = 0.27</span></span></td><td class="num">62.6%<span class="ci"><span class="d-bad">−0.8pp, p = 0.02</span></span></td><td class="num">23.8%<span class="ci"><span class="">+0.0pp, p = 0.89</span></span></td><td class="num">22.0%<span class="ci"><span class="">+0.0pp</span></span></td></tr>
+<tr class="mean"><td><strong>Mean of 3 seeds</strong></td><td class="num">70.8%<span class="ci">−0.1 ± 0.2pp</span></td><td class="num">65.5%<span class="ci">−0.4 ± 0.1pp</span></td><td class="num">62.7%<span class="ci">−0.7 ± 0.2pp</span></td><td class="num">23.8%<span class="ci">+0.0 ± 0.1pp</span></td><td class="num">22.0%<span class="ci">+0.0 ± 0.1pp</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small muted" style="margin-top:8px">No seed changes any benchmark by more than 0.8 points, and
+  2 of the 12 per-seed McNemar tests are significant at p &lt; 0.05: SAT strict, seed 43 (−0.8 points); SAT strict, seed 44 (−0.8 points).
+  The models do not learn to abstain: every pmG CountBench answer contains a number, and SAT answers that match no option
+  stay at 2.5% for base and at most 2.7% for pmG.</p>
+
+  <h2>6. Method</h2>
   <div class="panel">
     <dl class="defs">
       <dt>Reward</dt><dd>R = Σ max(0, c − 0.35)·(0.3 − h) − 0.1·Σ max(0, r − 0.35), over five-token groups of the caption,
@@ -225,7 +251,7 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
 
   <footer>
     Sources: <code>store/runs/v2_qwen25vl3b/eval/pmG/s4{2,3,4}</code>, <code>.../pmGnp/s42</code>,
-    <code>.../pmGjh/s42</code> and <code>.../analysis/</code>; write-up in <code>docs/qwen3b_object_probe_overnight.md</code>,
+    <code>.../pmGjh/s42</code> and <code>.../analysis/</code> (OOD: <code>.../analysis/ood/</code>); write-up in <code>docs/qwen3b_object_probe_overnight.md</code>,
     in the probe-rl-hallucination repository. Judge: gpt-5.1 with the v3 prompt (hedge-strict:
     <code>judge_v3_nohedge.txt</code>).
   </footer>
