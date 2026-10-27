@@ -66,7 +66,7 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
 <main>
   <h1>Probe-reward GRPO: paper numbers</h1>
   <p class="lede">Every number that goes into the paper, read from the saved evaluation reports. Captioning on 1,000
-  held-out COCO images (RL-test split); reward checks on each model’s probe-test captions. Updated 27 Oct 2026, 22:50 IST.</p>
+  held-out COCO images (RL-test split); reward checks on each model’s probe-test captions. Updated 28 Oct 2026, 00:34 IST.</p>
   <nav class="toc"><a href="#status">Status</a><a href="#read">How to read</a><a href="#q3">Qwen2.5-VL-3B</a>
     <a href="#transfer">Other models</a><a href="#q7">Qwen2.5-VL-7B</a><a href="#llava">LLaVA-1.5-7B</a>
     <a href="#gemma">Gemma 4</a><a href="#recall">Recall by object</a><a href="#ood">Other tasks</a>
@@ -82,8 +82,8 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
 <tr><td>Qwen2.5-VL-7B</td><td style="white-space:normal">pmG: passes</td><td style="white-space:normal">pmG: seeds 42, 43, 44</td><td style="white-space:normal">pmG s42</td><td class="muted" style="white-space:normal"></td></tr>
 <tr><td>LLaVA-1.5-7B</td><td style="white-space:normal">pmG: fails filler (+0.84); Tuned: passes; Lower floor: passes</td><td style="white-space:normal">pmG: seed 42; Tuned: seed 42; Lower floor: seed 42; Lower floor seed 42 step 100, Lower floor seed 43 step 100</td><td style="white-space:normal">pmG s42, Lower floor s42</td><td class="muted" style="white-space:normal"></td></tr>
 <tr><td>LLaVA-1.5-13B</td><td style="white-space:normal">pmG: fails filler (+0.73); Tuned: passes; Lower floor: passes</td><td style="white-space:normal">—</td><td style="white-space:normal">—</td><td class="muted" style="white-space:normal">Not trained: generating 32 captions per step does not fit on two 46 GB GPUs; needs a 3–4 GPU job.</td></tr>
-<tr><td>Gemma 4 12B</td><td style="white-space:normal">pmG: passes; Re-chosen: passes</td><td style="white-space:normal">—</td><td style="white-space:normal">—</td><td class="muted" style="white-space:normal">Reward re-chosen (rule fixed before the grid was read); not trained yet, needs a 2-GPU job of about 4.5 h per seed.</td></tr>
-<tr><td>Gemma 4 E4B</td><td style="white-space:normal">Re-chosen: passes</td><td style="white-space:normal">Re-chosen: seed 42</td><td style="white-space:normal">base only</td><td class="muted" style="white-space:normal">pmGc seed 42 judged; its OOD run and seeds 43–44 need a GPU job.</td></tr>
+<tr><td>Gemma 4 12B</td><td style="white-space:normal">pmG: passes; Re-chosen: passes</td><td style="white-space:normal">—</td><td style="white-space:normal">—</td><td class="muted" style="white-space:normal">Reward re-chosen (rule fixed before the grid was read); pmGc seed 42 training in job 52357 (28 Oct), base OOD running.</td></tr>
+<tr><td>Gemma 4 E4B</td><td style="white-space:normal">Re-chosen: passes</td><td style="white-space:normal">Re-chosen: seed 42</td><td style="white-space:normal">Re-chosen s42</td><td class="muted" style="white-space:normal">pmGc seed 42 judged, OOD done; seeds 43–44 need a GPU job.</td></tr>
       </tbody>
     </table>
   </div>
@@ -257,7 +257,7 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
 <tr class=""><td></td><td>Tuned<span class="sub">seed 42</span></td><td class="num">2.08 → 1.20</td><td class="num"><span class="d-good">−0.88</span><span class="ci">[−0.98, −0.78]</span></td><td class="num"><span class="d-good">+25.0pp</span><span class="ci">22.0 → 47.0%, p &lt; 10<sup>−10</sup></span></td><td class="num"><span class="d-good">−29.3pp</span><span class="ci">[−32.3, −26.1]</span></td><td class="num"><span class="d-bad">−12.1pp</span><span class="ci">[−13.2, −10.9]</span></td><td class="num"><span class="">−0.7pp</span><span class="ci">[−1.6, +0.2]</span></td><td class="num"><span class="">−7</span><span class="ci">[−9, −6]</span></td></tr>
 <tr class=""><td></td><td>Lower floor<span class="sub">seed 42</span></td><td class="num">2.14 → 1.29</td><td class="num"><span class="d-good">−0.85</span><span class="ci">[−0.96, −0.75]</span></td><td class="num"><span class="d-good">+22.5pp</span><span class="ci">21.5 → 44.0%, p &lt; 10<sup>−10</sup></span></td><td class="num"><span class="d-good">−24.5pp</span><span class="ci">[−27.7, −21.3]</span></td><td class="num"><span class="d-bad">−9.7pp</span><span class="ci">[−10.8, −8.6]</span></td><td class="num"><span class="">−0.5pp</span><span class="ci">[−1.2, +0.2]</span></td><td class="num"><span class="">−6</span><span class="ci">[−7, −4]</span></td></tr>
 <tr><td>LLaVA-1.5-13B</td><td colspan="9" class="muted">Not trained: generating 32 captions per step does not fit on two 46 GB GPUs; needs a 3–4 GPU job.</td></tr>
-<tr><td>Gemma 4 12B</td><td colspan="9" class="muted">Reward re-chosen (rule fixed before the grid was read); not trained yet, needs a 2-GPU job of about 4.5 h per seed.</td></tr>
+<tr><td>Gemma 4 12B</td><td colspan="9" class="muted">Reward re-chosen (rule fixed before the grid was read); pmGc seed 42 training in job 52357 (28 Oct), base OOD running.</td></tr>
 <tr class="ours"><td>Gemma 4 E4B</td><td>Re-chosen (Gemma rule)<span class="sub">seed 42</span></td><td class="num">1.65 → 1.64</td><td class="num"><span class="">−0.01</span><span class="ci">[−0.13, +0.11]</span></td><td class="num"><span class="d-good">+4.3pp</span><span class="ci">46.3 → 50.6%, p = 0.01</span></td><td class="num"><span class="d-good">−2.8pp</span><span class="ci">[−5.1, −0.5]</span></td><td class="num"><span class="">+0.2pp</span><span class="ci">[−0.8, +1.0]</span></td><td class="num"><span class="">+0.5pp</span><span class="ci">[−0.4, +1.4]</span></td><td class="num"><span class="">−2</span><span class="ci">[−5, +1]</span></td></tr>
       </tbody>
     </table>
@@ -398,7 +398,7 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
 <tr class="ours"><td>Lower floor, seed 42</td><td class="num">43.4%<span class="ci"><span class="">−1.2pp, p = 0.18</span></span></td><td class="num">61.2%<span class="ci"><span class="">+0.2pp, p = 0.60</span></span></td><td class="num">60.4%<span class="ci"><span class="">+0.1pp, p = 0.75</span></span></td><td class="num">7.1%<span class="ci"><span class="">+0.0pp, p = 0.80</span></span></td><td class="num">5.9%<span class="ci"><span class="">+0.0pp</span></span></td></tr>
 <tr><td colspan="6"><strong>Gemma 4 E4B</strong></td></tr>
 <tr class="base"><td>Base (no training)</td><td class="num">51.7%</td><td class="num">63.7%</td><td class="num">59.2%</td><td class="num">20.7%</td><td class="num">19.5%</td></tr>
-<tr><td colspan="6" class="muted">pmGc seed 42: runs after its test captions.</td></tr>
+<tr class="ours"><td>Re-chosen (Gemma rule), seed 42</td><td class="num">51.5%<span class="ci"><span class="">−0.2pp, p = 1.00</span></span></td><td class="num">63.9%<span class="ci"><span class="">+0.2pp, p = 0.36</span></span></td><td class="num">59.3%<span class="ci"><span class="">+0.1pp, p = 0.87</span></span></td><td class="num">20.8%<span class="ci"><span class="">+0.1pp, p = 0.18</span></span></td><td class="num">19.6%<span class="ci"><span class="">+0.1pp</span></span></td></tr>
       </tbody>
     </table>
   </div>
@@ -406,6 +406,7 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
 <li><strong>Qwen2.5-VL-3B</strong>: largest change 0.8 points; 2 of 12 McNemar tests significant at p &lt; 0.05: SAT strict, pmG seed 43 (−0.8); SAT strict, pmG seed 44 (−0.8). CountBench answers without a count 0.0% (base) → at most 0.0%; SAT answers matching no option 2.5% → at most 2.7%.</li>
 <li><strong>Qwen2.5-VL-7B</strong>: largest change 0.4 points; 1 of 4 McNemar tests significant at p &lt; 0.05: SAT strict, pmG seed 42 (+0.4). CountBench answers without a count 0.2% (base) → at most 0.2%; SAT answers matching no option 3.1% → at most 3.2%.</li>
 <li><strong>LLaVA-1.5-7B</strong>: largest change 1.2 points; 0 of 8 McNemar tests significant at p &lt; 0.05. CountBench answers without a count 0.4% (base) → at most 1.4%; SAT answers matching no option 0.4% → at most 0.5%.</li>
+<li><strong>Gemma 4 E4B</strong>: largest change 0.2 points; 0 of 4 McNemar tests significant at p &lt; 0.05. CountBench answers without a count 1.0% (base) → at most 0.8%; SAT answers matching no option 4.6% → at most 4.6%.</li>
   </ul>
 
   <h2 id="method">8. Method and reward parameters</h2>
