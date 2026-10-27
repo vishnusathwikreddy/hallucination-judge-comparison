@@ -66,7 +66,7 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
 <main>
   <h1>Probe-reward GRPO: paper numbers</h1>
   <p class="lede">Every number that goes into the paper, read from the saved evaluation reports. Captioning on 1,000
-  held-out COCO images (RL-test split); reward checks on each model’s probe-test captions. Updated 28 Oct 2026, 04:13 IST.</p>
+  held-out COCO images (RL-test split); reward checks on each model’s probe-test captions. Updated 28 Oct 2026, 04:19 IST.</p>
   <nav class="toc"><a href="#status">Status</a><a href="#read">How to read</a><a href="#q3">Qwen2.5-VL-3B</a>
     <a href="#transfer">Other models</a><a href="#q7">Qwen2.5-VL-7B</a><a href="#llava">LLaVA-1.5-7B</a>
     <a href="#gemma">Gemma 4</a><a href="#recall">Recall by object</a><a href="#ood">Other tasks</a>
@@ -80,7 +80,7 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
       <tbody>
 <tr><td>Qwen2.5-VL-3B</td><td style="white-space:normal">pmG: fails filler (+0.09)</td><td style="white-space:normal">pmG: seeds 42, 43, 44</td><td style="white-space:normal">pmG s42, pmG s43, pmG s44</td><td class="muted" style="white-space:normal"></td></tr>
 <tr><td>Qwen2.5-VL-7B</td><td style="white-space:normal">pmG: passes</td><td style="white-space:normal">pmG: seeds 42, 43, 44</td><td style="white-space:normal">pmG s42</td><td class="muted" style="white-space:normal"></td></tr>
-<tr><td>LLaVA-1.5-7B</td><td style="white-space:normal">pmG: fails filler (+0.84); Tuned: passes; Lower floor: passes</td><td style="white-space:normal">pmG: seed 42; Tuned: seed 42; Lower floor: seeds 42, 43; Lower floor seed 42 step 100, Lower floor seed 43 step 100</td><td style="white-space:normal">pmG s42, Lower floor s42</td><td class="muted" style="white-space:normal"></td></tr>
+<tr><td>LLaVA-1.5-7B</td><td style="white-space:normal">pmG: fails filler (+0.84); Tuned: passes; Lower floor: passes</td><td style="white-space:normal">pmG: seed 42; Tuned: seed 42; Lower floor: seeds 42, 43; Lower floor seed 42 step 100, Lower floor seed 43 step 100</td><td style="white-space:normal">pmG s42, Lower floor s42, Lower floor s43</td><td class="muted" style="white-space:normal"></td></tr>
 <tr><td>LLaVA-1.5-13B</td><td style="white-space:normal">pmG: fails filler (+0.73); Tuned: passes; Lower floor: passes</td><td style="white-space:normal">—</td><td style="white-space:normal">—</td><td class="muted" style="white-space:normal">Not trained: generating 32 captions per step does not fit on two 46 GB GPUs; needs a 3–4 GPU job.</td></tr>
 <tr><td>Gemma 4 12B</td><td style="white-space:normal">pmG: passes; Re-chosen: passes</td><td style="white-space:normal">Re-chosen: seed 42</td><td style="white-space:normal">base only</td><td class="muted" style="white-space:normal">pmGc seed 42 judged; its OOD arm and seeds 43–44 need a GPU job (base OOD done).</td></tr>
 <tr><td>Gemma 4 E4B</td><td style="white-space:normal">Re-chosen: passes</td><td style="white-space:normal">Re-chosen: seed 42</td><td style="white-space:normal">Re-chosen s42</td><td class="muted" style="white-space:normal">pmGc seed 42 judged, OOD done; seeds 43–44 need a GPU job.</td></tr>
@@ -478,6 +478,7 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
 <tr class="base"><td>Base (no training)</td><td class="num">44.6%</td><td class="num">61.0%</td><td class="num">60.3%</td><td class="num">7.1%</td><td class="num">5.9%</td></tr>
 <tr class="ours"><td>pmG (shared parameters), seed 42</td><td class="num">44.2%<span class="ci"><span class="">−0.4pp, p = 0.77</span></span></td><td class="num">60.7%<span class="ci"><span class="">−0.3pp, p = 0.53</span></span></td><td class="num">59.9%<span class="ci"><span class="">−0.4pp, p = 0.29</span></span></td><td class="num">7.1%<span class="ci"><span class="">+0.1pp, p = 0.61</span></span></td><td class="num">5.9%<span class="ci"><span class="">+0.0pp</span></span></td></tr>
 <tr class="ours"><td>Lower floor, seed 42</td><td class="num">43.4%<span class="ci"><span class="">−1.2pp, p = 0.18</span></span></td><td class="num">61.2%<span class="ci"><span class="">+0.2pp, p = 0.60</span></span></td><td class="num">60.4%<span class="ci"><span class="">+0.1pp, p = 0.75</span></span></td><td class="num">7.1%<span class="ci"><span class="">+0.0pp, p = 0.80</span></span></td><td class="num">5.9%<span class="ci"><span class="">+0.0pp</span></span></td></tr>
+<tr class="ours"><td>Lower floor, seed 43</td><td class="num">44.6%<span class="ci"><span class="">+0.0pp, p = 1.00</span></span></td><td class="num">61.0%<span class="ci"><span class="">+0.1pp, p = 0.92</span></span></td><td class="num">60.2%<span class="ci"><span class="">−0.1pp, p = 0.77</span></span></td><td class="num">7.1%<span class="ci"><span class="">+0.1pp, p = 0.48</span></span></td><td class="num">5.9%<span class="ci"><span class="">+0.0pp</span></span></td></tr>
 <tr><td colspan="6"><strong>Gemma 4 12B</strong></td></tr>
 <tr class="base"><td>Base (no training)</td><td class="num">92.5%</td><td class="num">72.2%</td><td class="num">68.3%</td><td class="num">28.6%</td><td class="num">27.9%</td></tr>
 <tr><td colspan="6"><strong>Gemma 4 E4B</strong></td></tr>
@@ -489,7 +490,7 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
   <ul class="notes">
 <li><strong>Qwen2.5-VL-3B</strong>: largest change 0.8 points; 2 of 12 McNemar tests significant at p &lt; 0.05: SAT strict, pmG seed 43 (−0.8); SAT strict, pmG seed 44 (−0.8). CountBench answers without a count 0.0% (base) → at most 0.0%; SAT answers matching no option 2.5% → at most 2.7%.</li>
 <li><strong>Qwen2.5-VL-7B</strong>: largest change 0.4 points; 1 of 4 McNemar tests significant at p &lt; 0.05: SAT strict, pmG seed 42 (+0.4). CountBench answers without a count 0.2% (base) → at most 0.2%; SAT answers matching no option 3.1% → at most 3.2%.</li>
-<li><strong>LLaVA-1.5-7B</strong>: largest change 1.2 points; 0 of 8 McNemar tests significant at p &lt; 0.05. CountBench answers without a count 0.4% (base) → at most 1.4%; SAT answers matching no option 0.4% → at most 0.5%.</li>
+<li><strong>LLaVA-1.5-7B</strong>: largest change 1.2 points; 0 of 12 McNemar tests significant at p &lt; 0.05. CountBench answers without a count 0.4% (base) → at most 1.4%; SAT answers matching no option 0.4% → at most 0.5%.</li>
 <li><strong>Gemma 4 E4B</strong>: largest change 0.2 points; 0 of 4 McNemar tests significant at p &lt; 0.05. CountBench answers without a count 1.0% (base) → at most 0.8%; SAT answers matching no option 4.6% → at most 4.6%.</li>
   </ul>
 
