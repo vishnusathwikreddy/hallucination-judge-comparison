@@ -66,7 +66,7 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
 <main>
   <h1>Probe-reward GRPO: paper numbers</h1>
   <p class="lede">Every number that goes into the paper, read from the saved evaluation reports. Captioning on 1,000
-  held-out COCO images (RL-test split); reward checks on each model’s probe-test captions. Updated 28 Oct 2026, 03:39 IST.</p>
+  held-out COCO images (RL-test split); reward checks on each model’s probe-test captions. Updated 28 Oct 2026, 04:00 IST.</p>
   <nav class="toc"><a href="#status">Status</a><a href="#read">How to read</a><a href="#q3">Qwen2.5-VL-3B</a>
     <a href="#transfer">Other models</a><a href="#q7">Qwen2.5-VL-7B</a><a href="#llava">LLaVA-1.5-7B</a>
     <a href="#gemma">Gemma 4</a><a href="#recall">Recall by object</a><a href="#ood">Other tasks</a>
@@ -244,7 +244,29 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
   parameters re-chosen for that model on its probe-test captions (section 8). Ranking at K = 30 groups, K = 15 for
   LLaVA-1.5 (shorter captions). The gated p<sub>h</sub> reward is θ = 0.5 without a risk term.</p>
 
-  <h3>2b. After RL, matched length</h3>
+  <h3>2b. After RL, full length (paper main table)</h3>
+  <div class="panel table-wrap">
+    <table>
+      <thead><tr><th>Model</th><th>Reward</th><th class="num">Judged errors, base → RL</th><th class="num">Δ judged ↓</th>
+        <th class="num">Δ clean ↑</th><th class="num">Δ CHAIR<sub>S</sub> ↓</th><th class="num">Δ recall ↑</th>
+        <th class="num">Δ tokens</th></tr></thead>
+      <tbody>
+<tr class="ours"><td>Qwen2.5-VL-3B</td><td>pmG (shared parameters)<span class="sub">seeds 42, 43, 44</span></td><td class="num">2.27 → 1.52</td><td class="num"><span class="d-good">−0.76</span><span class="ci">± 0.11 (sd)</span></td><td class="num"><span class="d-good">+13.9pp</span><span class="ci">± 1.8 (sd)</span></td><td class="num"><span class="d-good">−8.8pp</span><span class="ci">± 0.8 (sd)</span></td><td class="num"><span class="d-bad">−3.7pp</span><span class="ci">± 0.6 (sd)</span></td><td class="num"><span class="">−25</span><span class="ci">± 14 (sd)</span></td></tr>
+<tr class="ours"><td>Qwen2.5-VL-7B</td><td>pmG (shared parameters)<span class="sub">seeds 42, 43, 44</span></td><td class="num">1.52 → 1.20</td><td class="num"><span class="d-good">−0.32</span><span class="ci">± 0.12 (sd)</span></td><td class="num"><span class="d-good">+8.2pp</span><span class="ci">± 2.1 (sd)</span></td><td class="num"><span class="">−4.3pp</span><span class="ci">± 2.3 (sd)</span></td><td class="num"><span class="d-bad">−1.3pp</span><span class="ci">± 0.5 (sd)</span></td><td class="num"><span class="">−24</span><span class="ci">± 7 (sd)</span></td></tr>
+<tr class="ours"><td>LLaVA-1.5-7B</td><td>pmG (shared parameters)<span class="sub">seed 42</span></td><td class="num">2.38 → 1.03</td><td class="num"><span class="d-good">−1.35</span><span class="ci">[−1.47, −1.24]</span></td><td class="num"><span class="d-good">+36.0pp</span><span class="ci">17.5 → 53.5%, p &lt; 10<sup>−10</sup></span></td><td class="num"><span class="d-good">−40.0pp</span><span class="ci">[−43.2, −36.8]</span></td><td class="num"><span class="d-bad">−19.6pp</span><span class="ci">[−20.8, −18.3]</span></td><td class="num"><span class="">−11</span><span class="ci">[−12, −9]</span></td></tr>
+<tr class=""><td></td><td>Tuned<span class="sub">seed 42</span></td><td class="num">2.38 → 1.20</td><td class="num"><span class="d-good">−1.18</span><span class="ci">[−1.29, −1.07]</span></td><td class="num"><span class="d-good">+29.5pp</span><span class="ci">17.5 → 47.0%, p &lt; 10<sup>−10</sup></span></td><td class="num"><span class="d-good">−33.7pp</span><span class="ci">[−36.8, −30.4]</span></td><td class="num"><span class="d-bad">−14.0pp</span><span class="ci">[−15.2, −12.8]</span></td><td class="num"><span class="">−7</span><span class="ci">[−9, −6]</span></td></tr>
+<tr class=""><td></td><td>Lower floor<span class="sub">seeds 42, 43</span></td><td class="num">2.38 → 1.37</td><td class="num"><span class="d-good">−1.01</span><span class="ci">± 0.11 (sd)</span></td><td class="num"><span class="d-good">+25.0pp</span><span class="ci">± 2.1 (sd)</span></td><td class="num"><span class="d-good">−29.6pp</span><span class="ci">± 1.3 (sd)</span></td><td class="num"><span class="d-bad">−10.8pp</span><span class="ci">± 0.3 (sd)</span></td><td class="num"><span class="">−5</span><span class="ci">± 0 (sd)</span></td></tr>
+<tr><td>LLaVA-1.5-13B</td><td colspan="8" class="muted">Not trained: generating 32 captions per step does not fit on two 46 GB GPUs; needs a 3–4 GPU job.</td></tr>
+<tr><td>Gemma 4 12B</td><td colspan="8" class="muted">Reward re-chosen (rule fixed before the grid was read); pmGc seed 42 training in job 52357 (28 Oct), base OOD running.</td></tr>
+<tr class="ours"><td>Gemma 4 E4B</td><td>Re-chosen (Gemma rule)<span class="sub">seed 42</span></td><td class="num">1.71 → 1.64</td><td class="num"><span class="">−0.07</span><span class="ci">[−0.21, +0.06]</span></td><td class="num"><span class="d-good">+7.9pp</span><span class="ci">42.7 → 50.6%, p = 7×10<sup>-6</sup></span></td><td class="num"><span class="d-good">−3.6pp</span><span class="ci">[−5.8, −1.2]</span></td><td class="num"><span class="">−0.1pp</span><span class="ci">[−1.1, +0.8]</span></td><td class="num"><span class="">−2</span><span class="ci">[−5, +1]</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small muted note">Each trained model’s captions against its base model’s full captions, judged once per
+  model, so the base is the same for every seed and reward. The trained captions are shorter (last column), so part of
+  each difference comes from saying less; 2c removes that by cutting each base caption to the trained caption’s length.</p>
+
+  <h3>2c. After RL, matched length (appendix)</h3>
   <div class="panel table-wrap">
     <table>
       <thead><tr><th>Model</th><th>Reward</th><th class="num">Judged errors, base → RL</th><th class="num">Δ judged ↓</th>
@@ -263,12 +285,24 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
     </table>
   </div>
   <p class="small muted note">Mean ± sd over seeds where there are several, else the one seed with its interval. Main
-  objects: named by at least 3 of the image’s 5 human captions (section 6).</p>
+  objects: named by at least 3 of the image’s 5 human captions (section 6). The matched base depends on each seed’s
+  caption lengths and is judged in that seed’s own judge run, so it differs slightly between seeds.</p>
 
   <h2 id="q7">3. Qwen2.5-VL-7B, per seed (paper Table “qwen7b”)</h2>
-  <p class="muted small">Matched length, then full length. Full-length base: 1.52 judged errors per
+  <p class="muted small">Full length, then matched length. Full-length base: 1.52 judged errors per
   caption, 44.2% clean, 197.6 tokens. Judged errors at matched length per seed:
   −0.28 (−20%), −0.09 (−7%), −0.18 (−13%).</p>
+  <div class="panel table-wrap">
+    <table>
+      <thead><tr><th></th><th class="num">Judged errors ↓</th><th class="num">Clean captions ↑</th><th class="num">CHAIR<sub>S</sub> ↓</th><th class="num">CHAIR<sub>I</sub> ↓</th><th class="num">Wrong objects ↓</th><th class="num">Precision ↑</th><th class="num">Recall ↑</th><th class="num">Judged errors, matched length</th><th class="num">Tokens vs base</th></tr></thead>
+      <tbody>
+<tr class="ours"><td>Seed 42</td><td class="num"><span class="d-good">−0.45</span><span class="ci">[−0.56, −0.34]</span></td><td class="num"><span class="d-good">+10.3pp</span><span class="ci">44.2 → 54.5%, p = 8×10<sup>-8</sup></span></td><td class="num"><span class="d-good">−6.5pp</span><span class="ci">[−9.2, −3.9]</span></td><td class="num"><span class="d-good">−0.7pp</span><span class="ci">[−1.3, +0.0]</span></td><td class="num"><span class="d-good">−0.074</span><span class="ci">[−0.107, −0.041]</span></td><td class="num"><span class="d-good">+1.9pp</span><span class="ci">[+0.8, +2.9]</span></td><td class="num"><span class="d-bad">−1.9pp</span><span class="ci">[−2.8, −1.0]</span></td><td class="num"><span class="d-good">−0.28</span><span class="ci">[−0.38, −0.17]</span></td><td class="num"><span class="">−31</span><span class="ci">[−34, −29]</span></td></tr>
+<tr class="ours"><td>Seed 43</td><td class="num"><span class="d-good">−0.21</span><span class="ci">[−0.33, −0.09]</span></td><td class="num"><span class="d-good">+8.0pp</span><span class="ci">44.2 → 52.2%, p = 3×10<sup>-5</sup></span></td><td class="num"><span class="">−1.9pp</span><span class="ci">[−4.7, +0.6]</span></td><td class="num"><span class="">−0.3pp</span><span class="ci">[−0.9, +0.2]</span></td><td class="num"><span class="">−0.023</span><span class="ci">[−0.054, +0.008]</span></td><td class="num"><span class="">+0.5pp</span><span class="ci">[−0.5, +1.5]</span></td><td class="num"><span class="d-bad">−1.1pp</span><span class="ci">[−2.0, −0.2]</span></td><td class="num"><span class="">−0.09</span><span class="ci">[−0.20, +0.02]</span></td><td class="num"><span class="">−18</span><span class="ci">[−20, −16]</span></td></tr>
+<tr class="ours"><td>Seed 44</td><td class="num"><span class="d-good">−0.30</span><span class="ci">[−0.41, −0.18]</span></td><td class="num"><span class="d-good">+6.2pp</span><span class="ci">44.2 → 50.4%, p = 6×10<sup>-4</sup></span></td><td class="num"><span class="d-good">−4.6pp</span><span class="ci">[−7.3, −1.9]</span></td><td class="num"><span class="d-good">−0.9pp</span><span class="ci">[−1.6, −0.3]</span></td><td class="num"><span class="d-good">−0.048</span><span class="ci">[−0.081, −0.015]</span></td><td class="num"><span class="d-good">+1.3pp</span><span class="ci">[+0.3, +2.3]</span></td><td class="num"><span class="d-bad">−1.0pp</span><span class="ci">[−1.9, −0.1]</span></td><td class="num"><span class="d-good">−0.18</span><span class="ci">[−0.29, −0.08]</span></td><td class="num"><span class="">−23</span><span class="ci">[−26, −21]</span></td></tr>
+<tr class="mean"><td><strong>Mean of 3 seeds</strong></td><td class="num"><span class="d-good">−0.32</span><span class="ci">± 0.12 (sd)</span></td><td class="num"><span class="d-good">+8.2pp</span><span class="ci">± 2.1 (sd)</span></td><td class="num"><span class="">−4.3pp</span><span class="ci">± 2.3 (sd)</span></td><td class="num"><span class="">−0.6pp</span><span class="ci">± 0.3 (sd)</span></td><td class="num"><span class="">−0.048</span><span class="ci">± 0.026 (sd)</span></td><td class="num"><span class="">+1.2pp</span><span class="ci">± 0.7 (sd)</span></td><td class="num"><span class="d-bad">−1.3pp</span><span class="ci">± 0.5 (sd)</span></td><td class="num"><span class="">−0.18</span><span class="ci">± 0.09 (sd)</span></td><td class="num"><span class="">−24</span><span class="ci">± 7 (sd)</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   <div class="panel table-wrap">
     <table>
       <thead><tr><th></th><th class="num">Judged errors ↓</th><th class="num">Clean captions ↑</th><th class="num">CHAIR<sub>S</sub> ↓</th><th class="num">CHAIR<sub>I</sub> ↓</th><th class="num">Wrong objects ↓</th><th class="num">Precision ↑</th><th class="num">Recall ↑</th><th class="num">Judged errors, full length</th><th class="num">Tokens vs base</th></tr></thead>
@@ -286,6 +320,23 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
   scratch in job 52357). Lower-floor step-100 checkpoints: seed 42, and seed 43 from an earlier run stopped after step
   199. Full-length base: 2.38 judged errors per caption,
   17.5% clean, 111.8 tokens.</p>
+  <div class="panel table-wrap">
+    <table>
+      <thead><tr><th></th><th class="num">Judged errors ↓</th><th class="num">Clean captions ↑</th><th class="num">CHAIR<sub>S</sub> ↓</th><th class="num">CHAIR<sub>I</sub> ↓</th><th class="num">Wrong objects ↓</th><th class="num">Precision ↑</th><th class="num">Recall ↑</th><th class="num">Judged errors, matched length</th><th class="num">Tokens vs base</th></tr></thead>
+      <tbody>
+<tr><td colspan="10"><strong>pmG (shared parameters)</strong></td></tr>
+<tr class="ours"><td>Seed 42</td><td class="num"><span class="d-good">−1.35</span><span class="ci">[−1.47, −1.24]</span></td><td class="num"><span class="d-good">+36.0pp</span><span class="ci">17.5 → 53.5%, p &lt; 10<sup>−10</sup></span></td><td class="num"><span class="d-good">−40.0pp</span><span class="ci">[−43.2, −36.8]</span></td><td class="num"><span class="d-good">−9.7pp</span><span class="ci">[−10.7, −8.7]</span></td><td class="num"><span class="d-good">−0.777</span><span class="ci">[−0.847, −0.711]</span></td><td class="num"><span class="d-good">+15.7pp</span><span class="ci">[+14.2, +17.3]</span></td><td class="num"><span class="d-bad">−19.6pp</span><span class="ci">[−20.8, −18.3]</span></td><td class="num"><span class="d-good">−0.98</span><span class="ci">[−1.09, −0.88]</span></td><td class="num"><span class="">−11</span><span class="ci">[−12, −9]</span></td></tr>
+<tr><td colspan="10"><strong>Tuned</strong></td></tr>
+<tr class="ours"><td>Seed 42</td><td class="num"><span class="d-good">−1.18</span><span class="ci">[−1.29, −1.07]</span></td><td class="num"><span class="d-good">+29.5pp</span><span class="ci">17.5 → 47.0%, p &lt; 10<sup>−10</sup></span></td><td class="num"><span class="d-good">−33.7pp</span><span class="ci">[−36.8, −30.4]</span></td><td class="num"><span class="d-good">−8.3pp</span><span class="ci">[−9.2, −7.3]</span></td><td class="num"><span class="d-good">−0.656</span><span class="ci">[−0.720, −0.593]</span></td><td class="num"><span class="d-good">+12.6pp</span><span class="ci">[+11.1, +14.1]</span></td><td class="num"><span class="d-bad">−14.0pp</span><span class="ci">[−15.2, −12.8]</span></td><td class="num"><span class="d-good">−0.88</span><span class="ci">[−0.98, −0.78]</span></td><td class="num"><span class="">−7</span><span class="ci">[−9, −6]</span></td></tr>
+<tr><td colspan="10"><strong>Lower floor</strong></td></tr>
+<tr class="ours"><td>Seed 42</td><td class="num"><span class="d-good">−1.09</span><span class="ci">[−1.20, −0.98]</span></td><td class="num"><span class="d-good">+26.5pp</span><span class="ci">17.5 → 44.0%, p &lt; 10<sup>−10</sup></span></td><td class="num"><span class="d-good">−28.7pp</span><span class="ci">[−31.8, −25.5]</span></td><td class="num"><span class="d-good">−7.3pp</span><span class="ci">[−8.2, −6.4]</span></td><td class="num"><span class="d-good">−0.599</span><span class="ci">[−0.665, −0.537]</span></td><td class="num"><span class="d-good">+11.4pp</span><span class="ci">[+10.0, +12.9]</span></td><td class="num"><span class="d-bad">−11.0pp</span><span class="ci">[−12.1, −9.9]</span></td><td class="num"><span class="d-good">−0.85</span><span class="ci">[−0.96, −0.75]</span></td><td class="num"><span class="">−6</span><span class="ci">[−7, −4]</span></td></tr>
+<tr class="ours"><td>Seed 43</td><td class="num"><span class="d-good">−0.94</span><span class="ci">[−1.05, −0.82]</span></td><td class="num"><span class="d-good">+23.5pp</span><span class="ci">17.5 → 41.0%, p &lt; 10<sup>−10</sup></span></td><td class="num"><span class="d-good">−30.5pp</span><span class="ci">[−33.8, −27.3]</span></td><td class="num"><span class="d-good">−7.9pp</span><span class="ci">[−8.8, −7.0]</span></td><td class="num"><span class="d-good">−0.625</span><span class="ci">[−0.688, −0.564]</span></td><td class="num"><span class="d-good">+12.3pp</span><span class="ci">[+11.0, +13.7]</span></td><td class="num"><span class="d-bad">−10.6pp</span><span class="ci">[−11.7, −9.5]</span></td><td class="num"><span class="d-good">−0.81</span><span class="ci">[−0.92, −0.70]</span></td><td class="num"><span class="">−5</span><span class="ci">[−6, −4]</span></td></tr>
+<tr><td>Seed 42, step 100</td><td class="num"><span class="d-good">−0.91</span><span class="ci">[−1.02, −0.79]</span></td><td class="num"><span class="d-good">+21.9pp</span><span class="ci">17.5 → 39.4%, p &lt; 10<sup>−10</sup></span></td><td class="num"><span class="d-good">−26.4pp</span><span class="ci">[−29.5, −23.1]</span></td><td class="num"><span class="d-good">−6.5pp</span><span class="ci">[−7.4, −5.5]</span></td><td class="num"><span class="d-good">−0.564</span><span class="ci">[−0.627, −0.503]</span></td><td class="num"><span class="d-good">+10.3pp</span><span class="ci">[+8.9, +11.7]</span></td><td class="num"><span class="d-bad">−11.2pp</span><span class="ci">[−12.3, −10.1]</span></td><td class="num"><span class="d-good">−0.64</span><span class="ci">[−0.74, −0.53]</span></td><td class="num"><span class="">−7</span><span class="ci">[−9, −6]</span></td></tr>
+<tr><td>Seed 43, step 100</td><td class="num"><span class="d-good">−0.91</span><span class="ci">[−1.02, −0.81]</span></td><td class="num"><span class="d-good">+22.3pp</span><span class="ci">17.5 → 39.8%, p &lt; 10<sup>−10</sup></span></td><td class="num"><span class="d-good">−26.8pp</span><span class="ci">[−30.1, −23.6]</span></td><td class="num"><span class="d-good">−6.5pp</span><span class="ci">[−7.4, −5.6]</span></td><td class="num"><span class="d-good">−0.580</span><span class="ci">[−0.642, −0.519]</span></td><td class="num"><span class="d-good">+10.9pp</span><span class="ci">[+9.5, +12.2]</span></td><td class="num"><span class="d-bad">−11.2pp</span><span class="ci">[−12.3, −10.0]</span></td><td class="num"><span class="d-good">−0.61</span><span class="ci">[−0.72, −0.51]</span></td><td class="num"><span class="">−8</span><span class="ci">[−10, −7]</span></td></tr>
+<tr class="mean"><td><strong>Mean of 2 seeds</strong></td><td class="num"><span class="d-good">−1.01</span><span class="ci">± 0.11 (sd)</span></td><td class="num"><span class="d-good">+25.0pp</span><span class="ci">± 2.1 (sd)</span></td><td class="num"><span class="d-good">−29.6pp</span><span class="ci">± 1.3 (sd)</span></td><td class="num"><span class="d-good">−7.6pp</span><span class="ci">± 0.4 (sd)</span></td><td class="num"><span class="d-good">−0.612</span><span class="ci">± 0.018 (sd)</span></td><td class="num"><span class="d-good">+11.9pp</span><span class="ci">± 0.6 (sd)</span></td><td class="num"><span class="d-bad">−10.8pp</span><span class="ci">± 0.3 (sd)</span></td><td class="num"><span class="d-good">−0.83</span><span class="ci">± 0.03 (sd)</span></td><td class="num"><span class="">−5</span><span class="ci">± 0 (sd)</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   <div class="panel table-wrap">
     <table>
       <thead><tr><th></th><th class="num">Judged errors ↓</th><th class="num">Clean captions ↑</th><th class="num">CHAIR<sub>S</sub> ↓</th><th class="num">CHAIR<sub>I</sub> ↓</th><th class="num">Wrong objects ↓</th><th class="num">Precision ↑</th><th class="num">Recall ↑</th><th class="num">Judged errors, full length</th><th class="num">Tokens vs base</th></tr></thead>
@@ -340,7 +391,15 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
       </tbody>
     </table>
   </div>
-  <h3>Gemma 4 E4B, re-chosen reward (pmGc)</h3>
+  <h3>Gemma 4 E4B, re-chosen reward (pmGc): full length, then matched length</h3>
+  <div class="panel table-wrap">
+    <table>
+      <thead><tr><th></th><th class="num">Judged errors ↓</th><th class="num">Clean captions ↑</th><th class="num">CHAIR<sub>S</sub> ↓</th><th class="num">CHAIR<sub>I</sub> ↓</th><th class="num">Wrong objects ↓</th><th class="num">Precision ↑</th><th class="num">Recall ↑</th><th class="num">Judged errors, matched length</th><th class="num">Tokens vs base</th></tr></thead>
+      <tbody>
+<tr class="ours"><td>Seed 42</td><td class="num"><span class="">−0.07</span><span class="ci">[−0.21, +0.06]</span></td><td class="num"><span class="d-good">+7.9pp</span><span class="ci">42.7 → 50.6%, p = 7×10<sup>-6</sup></span></td><td class="num"><span class="d-good">−3.6pp</span><span class="ci">[−5.8, −1.2]</span></td><td class="num"><span class="">−0.5pp</span><span class="ci">[−1.0, +0.0]</span></td><td class="num"><span class="">−0.032</span><span class="ci">[−0.064, +0.000]</span></td><td class="num"><span class="">+0.9pp</span><span class="ci">[−0.1, +1.9]</span></td><td class="num"><span class="">−0.1pp</span><span class="ci">[−1.1, +0.8]</span></td><td class="num"><span class="">−0.01</span><span class="ci">[−0.13, +0.11]</span></td><td class="num"><span class="">−2</span><span class="ci">[−5, +1]</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   <div class="panel table-wrap">
     <table>
       <thead><tr><th></th><th class="num">Judged errors ↓</th><th class="num">Clean captions ↑</th><th class="num">CHAIR<sub>S</sub> ↓</th><th class="num">CHAIR<sub>I</sub> ↓</th><th class="num">Wrong objects ↓</th><th class="num">Precision ↑</th><th class="num">Recall ↑</th><th class="num">Judged errors, full length</th><th class="num">Tokens vs base</th></tr></thead>
@@ -349,6 +408,7 @@ footer { margin-top: 48px; color: var(--muted); font-size: .82rem; border-top: 1
       </tbody>
     </table>
   </div>
+  <p class="small muted note">Gemma 4 12B: Reward re-chosen (rule fixed before the grid was read); pmGc seed 42 training in job 52357 (28 Oct), base OOD running.</p>
 
   <h2 id="recall">6. Object recall by how salient the object is</h2>
   <p class="muted small">Matched-length recall split by how many of the image’s five COCO human captions name the object:
